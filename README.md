@@ -1,198 +1,236 @@
-# Fork Terminal Skill
-> A simple skill you can use to fork your agentic coding tools to a new terminal window.
->
-> Why? To offload context (delegate), to branch work, to parallelize work, to run the same command against different tools + models, and more.
->
-> Check out this [YouTube video](https://youtu.be/X2ciJedw2vU) where we build this skill from scratch.
+# Claude Code Lab 🧪
 
-<img src="images/fork-terminal.png" alt="Fork Terminal Skill" width="800">
+> A hands-on learning laboratory for mastering [Claude Code](https://docs.anthropic.com/en/docs/claude-code) extensibility
 
-A [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skill that enables AI agents to spawn new terminal windows on demand. This skill extends Claude Code's capabilities to launch additional terminal sessions—including other AI coding assistants like Claude Code, Codex CLI, and Gemini CLI—in parallel terminals.
+This repository is a **practical learning workspace** where theory meets practice. Read concepts, implement features, experiment with patterns, and cement your knowledge through hands-on work.
 
-## Requirements
-
-- [Claude Code](https://docs.anthropic.com/en/docs/claude-code)
-- [Gemini CLI](https://github.com/google-gemini/gemini-cli)
-- [Codex CLI](https://github.com/openai/codex)
-
-## What is a Claude Code Skill?
-
-Claude Code skills are **modular, context-aware capabilities** that extend what Claude can do. Unlike slash commands (which require explicit `/command` invocation), skills are **automatically discovered and invoked** by Claude when user requests match the skill's description.
-
-Skills live in `.claude/skills/` directories and consist of:
-- A `SKILL.md` file defining triggers, instructions, and workflow
-- Supporting files (scripts, templates, documentation)
-
-When you say something like "fork terminal to run tests with Claude Code", Claude automatically detects the matching skill, reads the instructions, and executes the workflow.
-
-## Purpose
-
-This skill allows you to:
-- **Spawn parallel AI agents** in separate terminal windows
-- **Run raw CLI commands** in new terminals
-- **Pass conversation context** to forked agents (summary mode)
-
-This is useful when you want Claude to delegate work to another agent running independently, or when you need to run long-running commands in a separate terminal.
-
-## Supported Tools
-
-| Tool            | Trigger Examples                      | Default Model          |
-| --------------- | ------------------------------------- | ---------------------- |
-| **Claude Code** | "fork terminal use claude code to..." | `opus`                 |
-| **Codex CLI**   | "fork terminal use codex to..."       | `gpt-5.1-codex-max`    |
-| **Gemini CLI**  | "fork terminal use gemini to..."      | `gemini-3-pro-preview` |
-| **Raw CLI**     | "fork terminal run ffmpeg..."         | N/A                    |
-
-### Model Modifiers
-
-Each agentic tool supports model selection:
-- **Default**: Uses the tool's default model
-- **"fast"**: Uses a lighter, faster model (e.g., `haiku`, `gpt-5.1-codex-mini`, `gemini-2.5-flash`)
-- **"heavy"**: Uses the most capable model
-
-## Usage Examples
-
-### Examples you can run NOW
-
-These examples work against this codebase. Generated files go to `temp/`.
-
-**Claude Code**
-```
-# Analyze the skill architecture and save a report
-"fork terminal use claude code to analyze SKILL.md and write a summary to temp/skill-analysis.md"
-
-# Add Linux support to fork_terminal.py
-"fork terminal use claude code to add Linux support to tools/fork_terminal.py, save changes to temp/fork_terminal_linux.py"
-
-# Generate documentation for the Python tool
-"fork terminal use claude code fast to read tools/fork_terminal.py and generate docstrings, save to temp/fork_terminal_documented.py"
-```
-
-**Codex CLI**
-```
-# Review the cookbook structure
-"fork terminal use codex to review cookbook/*.md and write suggestions to temp/codex-cookbook-review.md"
-
-# Generate a test file for the fork tool
-"fork terminal use codex to read tools/fork_terminal.py and generate pytest tests, save to temp/test_fork_terminal.py"
-
-# Analyze the SKILL.md workflow
-"fork terminal use codex fast to analyze SKILL.md and explain the workflow in temp/workflow-explained.md"
-```
-
-**Gemini CLI**
-```
-# Document the skill's purpose
-"fork terminal use gemini to read README.md and SKILL.md, write a one-pager summary to temp/gemini-summary.md"
-
-# Suggest new cookbook entries
-"fork terminal use gemini to review cookbook/ and suggest a new tool integration, save to temp/new-cookbook-idea.md"
-
-# Analyze cross-platform support
-"fork terminal use gemini fast to analyze tools/fork_terminal.py and recommend Linux implementation, save to temp/linux-recommendations.md"
-```
-
-**Raw CLI**
-```
-# List all skill files
-"new terminal: find .claude/skills -name '*.md' | head -20"
-
-# Watch for file changes
-"fork terminal: watch -n 2 'ls -la .claude/skills/fork-terminal/'"
-```
-
-**Multi-Agent Combinations**
-```
-# Fork all three agents to review different aspects of the codebase
-"fork terminal use claude code to review tools/fork_terminal.py and save analysis to temp/claude-tool-review.md,
- then fork terminal use codex to review SKILL.md and save analysis to temp/codex-skill-review.md,
- then fork terminal use gemini to review cookbook/*.md and save analysis to temp/gemini-cookbook-review.md"
-
-# Race all three agents on the same task
-"fork three terminals: claude code, codex, and gemini - each should read README.md and write improvement suggestions to temp/<agent>-readme-suggestions.md"
-
-# Parallel documentation generation
-"fork terminal use claude code to document tools/fork_terminal.py to temp/claude-docs.md,
- fork terminal use codex to document SKILL.md to temp/codex-docs.md,
- fork terminal use gemini to document the cookbook/ files to temp/gemini-docs.md"
-```
-
-**With Conversation Summary (Context Handoff)**
-```
-# Hand off your current conversation context to a new Claude Code agent
-"fork terminal use claude code to request a new plan in temp/specs/<relevant-name>.md that details a net new cookbook file for a new agentic coding tool, summarize work so far"
-
-# Delegate a subtask with full context to Gemini
-"fork terminal use gemini to implement temp/specs/add-linux-support.md that details how to add Linux support to the fork terminal skill, include summary"
-```
-
-### Examples you can run later
-
-These examples demonstrate usage patterns for other projects.
+## What's Inside
 
 ```
-# Launch Claude Code for a refactor task
-"fork terminal use claude code to refactor the auth module"
-
-# Use a faster model for quick fixes
-"fork terminal use claude code fast to fix the typo in utils.py"
-
-# Launch Gemini CLI for test generation
-"fork terminal use gemini to write tests for the API"
-
-# Run a dev server in a new terminal
-"create a new terminal to run npm run dev"
-
-# Hand off context to a new agent
-"fork terminal use claude code to implement the feature we discussed, summarize work so far"
+claude-code-lab/
+├── docs/                           # 📚 Complete reference documentation
+│   ├── concepts/                   # Deep-dive guides (7 topics)
+│   ├── examples/                   # Practical patterns
+│   └── quick-reference/            # Cheat sheets & decision trees
+├── experiments/                    # 🧪 Your playground for learning
+│   ├── commands/                   # Slash commands you create
+│   ├── skills/                     # Skills you build
+│   ├── tools/                      # Custom tools you write
+│   └── notes/                      # Your learning notes
+├── .claude/                        # Working Claude Code setup
+│   ├── skills/fork-terminal/       # Example skill (fully functional)
+│   └── commands/                   # Utility commands
+└── README.md                       # This file (tracks your progress!)
 ```
 
-## How It Works
+## Learning Path
 
-1. **Trigger Detection**: Claude detects phrases like "fork terminal", "new terminal", or "fork session"
-2. **Cookbook Selection**: Based on the requested tool, Claude reads the appropriate cookbook (e.g., `claude-code.md`)
-3. **Command Construction**: Claude builds the command with proper flags (interactive mode, model selection, permission bypasses)
-4. **Terminal Spawn**: The `fork_terminal.py` script opens a new terminal window and executes the command
+Track your progress through Claude Code mastery:
 
-## Architecture
+### Phase 1: Foundation ✅
+- [x] Understand Skills vs Commands vs Tools
+- [ ] Read [Skills Concept Guide](docs/concepts/skills.md)
+- [ ] Read [Commands Concept Guide](docs/concepts/commands.md)
+- [ ] Read [Tools Concept Guide](docs/concepts/tools.md)
+- [ ] Study [Decision Tree](docs/quick-reference/decision-tree.md)
+
+### Phase 2: First Experiments 🎯
+- [ ] Create your first slash command
+- [ ] Build a simple workflow skill
+- [ ] Write a custom tool
+- [ ] Test the fork-terminal example skill
+
+### Phase 3: Power Features ⚡
+- [ ] Read [Background Agents Guide](docs/concepts/background-agents.md)
+- [ ] Experiment with parallel task execution
+- [ ] Read [Hooks Guide](docs/concepts/hooks.md)
+- [ ] Set up an automation hook
+- [ ] Read [MCP Servers Guide](docs/concepts/mcp-servers.md)
+- [ ] Install and test an MCP server
+
+### Phase 4: Advanced Patterns 🚀
+- [ ] Study [Skill Patterns](docs/examples/skill-patterns.md)
+- [ ] Build a multi-variant skill (cookbook pattern)
+- [ ] Create a tool-enhanced skill
+- [ ] Implement background agent orchestration
+- [ ] Set up context handoff pattern
+
+### Phase 5: Mastery 🏆
+- [ ] Read [Configuration Guide](docs/concepts/configuration.md)
+- [ ] Set up global CLAUDE.md with your preferences
+- [ ] Create a complete project template
+- [ ] Build an integrated workflow (skill + tool + hook)
+- [ ] Contribute patterns back to community
+
+## Quick Start
+
+### 1. Explore the Documentation
+```bash
+# Start with the overview
+open docs/README.md
+
+# Or jump to a specific concept
+open docs/concepts/skills.md
+```
+
+### 2. Try the Example Skill
+This repo includes a fully functional **fork-terminal** skill:
 
 ```
-.claude/skills/fork-terminal/
-├── SKILL.md                    # Skill definition and workflow
-├── cookbook/
-│   ├── cli-command.md          # Raw CLI instructions
-│   ├── claude-code.md          # Claude Code agent instructions
-│   ├── codex-cli.md            # Codex CLI instructions
-│   └── gemini-cli.md           # Gemini CLI instructions
-├── prompts/
-│   └── fork_summary_user_prompt.md  # Template for context handoff
-└── tools/
-    └── fork_terminal.py        # Cross-platform terminal spawner
+# Try it out (if you have Claude Code, Codex, or Gemini installed)
+"fork terminal use claude code to analyze this README"
 ```
 
-## Platform Support
+Study its structure in `.claude/skills/fork-terminal/` to see a real-world implementation.
 
-| Platform    | Status              | Method                     |
-| ----------- | ------------------- | -------------------------- |
-| **macOS**   | Supported           | AppleScript → Terminal.app |
-| **Windows** | Supported           | `cmd /k` via `start`       |
-| **Linux**   | Not yet implemented | —                          |
+### 3. Create Your First Command
+```bash
+# Create a simple command
+echo "Review my code changes and provide feedback." > .claude/commands/review.md
 
-## Installation
+# Use it
+# Type: /review
+```
 
-Copy the `.claude/skills/fork-terminal/` directory to your project's `.claude/skills/` folder, or to `~/.claude/skills/` for personal use across all projects.
+### 4. Start Experimenting
+Use the `experiments/` directory for your learning projects.
 
-## Improvements
+## Experiments
 
-Ideas for future enhancements:
+Document your learning experiments here:
 
-- **Focus spawned windows** - Bring new terminal windows to front automatically, or keep them in background based on user preference
-- **More agentic coding tools** - Add cookbooks for OpenCode, and other agentic coding tools.
-- **Whatever else you can think of** - Feel free to fork the terminal fork skill and make it your own.
+### Completed Experiments ✅
+- [x] Built comprehensive documentation system
+- [ ] *Your experiments will appear here*
 
-## Master **Agentic Coding**
-> Prepare for the future of software engineering
+### In Progress 🔄
+- [ ] *What are you working on?*
 
-Learn tactical agentic coding patterns with [Tactical Agentic Coding](https://agenticengineer.com/tactical-agentic-coding?y=frktskl)
+### Planned 📋
+- [ ] Create personal slash commands collection
+- [ ] Build a code review skill
+- [ ] Experiment with background agents
+- [ ] Set up auto-format hooks
+- [ ] Install GitHub MCP server
+- [ ] Create custom database tool
+- [ ] Build multi-agent orchestration
 
-Follow the [IndyDevDan YouTube channel](https://www.youtube.com/@indydevdan) to improve your agentic coding advantage.
+## Key Concepts Quick Reference
+
+| Concept | What | When | File Location |
+|---------|------|------|---------------|
+| **Skill** | Auto-invoked workflow | User says trigger phrase | `.claude/skills/name/SKILL.md` |
+| **Command** | Prompt shortcut | User types `/cmd` | `.claude/commands/cmd.md` |
+| **Tool** | Custom capability | Claude calls it | `.claude/skills/name/tools/tool.py` |
+| **Hook** | Event automation | On events | `settings.json` |
+| **MCP** | External tools | Claude calls them | `settings.json` |
+
+See [Cheat Sheet](docs/quick-reference/cheatsheet.md) for more!
+
+## Documentation Guide
+
+### 📚 Concept Guides
+Start here for deep understanding:
+- [Skills](docs/concepts/skills.md) - Auto-invoked workflows
+- [Commands](docs/concepts/commands.md) - User shortcuts
+- [Tools](docs/concepts/tools.md) - Custom capabilities
+- [Hooks](docs/concepts/hooks.md) - Event automation
+- [MCP Servers](docs/concepts/mcp-servers.md) - External integrations
+- [Background Agents](docs/concepts/background-agents.md) - Parallel execution
+- [Configuration](docs/concepts/configuration.md) - Settings & setup
+
+### 💡 Practical Examples
+- [Skill Patterns](docs/examples/skill-patterns.md) - 10 common patterns to copy
+
+### ⚡ Quick Reference
+- [Cheat Sheet](docs/quick-reference/cheatsheet.md) - Fast syntax lookup
+- [Decision Tree](docs/quick-reference/decision-tree.md) - "What should I build?"
+
+## Example: Fork Terminal Skill
+
+This repo includes a complete, working skill as a learning reference:
+
+**Location:** `.claude/skills/fork-terminal/`
+
+**What it does:** Spawns new terminal windows to run Claude Code, Codex CLI, Gemini CLI, or raw CLI commands in parallel.
+
+**Key learnings:**
+- ✅ Tool-enhanced skill (includes custom Python tool)
+- ✅ Multi-variant pattern (cookbook for different scenarios)
+- ✅ Context handoff (can pass conversation history)
+- ✅ Cross-platform support (macOS + Windows)
+
+**Try it:**
+```
+"fork terminal use claude code to analyze docs/concepts/skills.md"
+```
+
+Study the source code to see how it all works!
+
+## Learning Resources
+
+### Official Documentation
+- [Claude Code Docs](https://docs.anthropic.com/en/docs/claude-code)
+- [Model Context Protocol](https://spec.modelcontextprotocol.io)
+- [MCP Servers Repository](https://github.com/modelcontextprotocol/servers)
+
+### This Repository
+- Complete concept guides in `docs/concepts/`
+- Practical examples in `docs/examples/`
+- Quick reference materials in `docs/quick-reference/`
+
+### Community
+- [IndyDevDan YouTube](https://www.youtube.com/@indydevdan) - Agentic coding tutorials
+- [Fork Terminal Skill Video](https://youtu.be/X2ciJedw2vU) - Building skills from scratch
+
+## Tips for Learning
+
+1. **Read, then do** - Don't just read docs, implement what you learn
+2. **Start simple** - Begin with commands, move to skills, then advanced features
+3. **Copy patterns** - Use examples as templates, customize for your needs
+4. **Experiment freely** - The `experiments/` directory is your sandbox
+5. **Track progress** - Check off items in this README as you learn
+6. **Document learnings** - Add notes in `experiments/notes/`
+
+## What to Build
+
+Not sure where to start? Try these:
+
+### Beginner Projects
+- [ ] `/commit` - Smart git commit command
+- [ ] `/test` - Run tests and fix failures
+- [ ] Simple code formatter skill
+
+### Intermediate Projects
+- [ ] Multi-pass code review skill
+- [ ] Database query tool with MCP
+- [ ] Auto-format hook
+
+### Advanced Projects
+- [ ] Multi-agent research orchestration
+- [ ] Context-aware deployment skill
+- [ ] Custom MCP server for your APIs
+
+## Progress Notes
+
+### Session Log
+
+**2025-12-10**: Initial setup
+- Created comprehensive documentation system
+- Set up repository structure
+- Ready to start hands-on learning!
+
+*Add your own notes as you learn...*
+
+---
+
+## Next Steps
+
+Ready to dive in? Start here:
+
+1. **Foundations** → Read [docs/concepts/skills.md](docs/concepts/skills.md)
+2. **Quick Win** → Create your first slash command
+3. **Deep Dive** → Study the fork-terminal example skill
+4. **Experiment** → Build something in `experiments/`
+
+Happy learning! 🚀
