@@ -12,11 +12,11 @@ Follow the `Instructions`, execute the `Workflow`, based on the `Cookbook`.
 ## Variables
 
 ENABLE_JAVASCRIPT: true
-ENABLE_PYTHON: false
+ENABLE_PYTHON: true
 ENABLE_GO: false
 OUTPUT_MODE: display  # "display" or "save"
 OUTPUT_FILE: .project-context.md
-SUPPORTED_PROJECT_TYPES: javascript, typescript
+SUPPORTED_PROJECT_TYPES: javascript, typescript, python
 
 ## Instructions
 
@@ -50,8 +50,18 @@ SUPPORTED_PROJECT_TYPES: javascript, typescript
   - "show me project context"
   - "generate project context and save it"
 
+### Python Projects
+
+- IF: The project has `requirements.txt` or `pyproject.toml` AND `ENABLE_PYTHON` is true.
+- THEN: Read and execute: `.claude/skills/project-context/cookbook/python.md`
+- EXAMPLES:
+  - "analyze this project"
+  - "what's the project structure"
+  - "generate project context"
+  - "show me the Django app structure"
+
 ### Unknown Project Type
 
 - IF: No specific project type detected.
 - THEN: Perform basic analysis using available built-in tools (Glob, Read).
-- Report what can be detected and suggest adding Python/Go support in the future.
+- Report what can be detected and suggest adding Go or other language support.
