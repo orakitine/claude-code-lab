@@ -40,12 +40,12 @@ Track your progress through Claude Code mastery:
 - [x] Create your first slash command
 - [x] Build a simple workflow skill
 - [x] Write a custom tool
-- [ ] Test the fork-terminal example skill
+- [x] Test the fork-terminal example skill
 
 ### Phase 3: Power Features ⚡
 
-- [ ] Read [Background Agents Guide](docs/concepts/background-agents.md)
-- [ ] Experiment with parallel task execution
+- [x] Read [Background Agents Guide](docs/concepts/background-agents.md)
+- [x] Experiment with parallel task execution
 - [ ] Read [Hooks Guide](docs/concepts/hooks.md)
 - [ ] Set up an automation hook
 - [ ] Read [MCP Servers Guide](docs/concepts/mcp-servers.md)
@@ -54,8 +54,8 @@ Track your progress through Claude Code mastery:
 ### Phase 4: Advanced Patterns 🚀
 
 - [ ] Study [Skill Patterns](docs/examples/skill-patterns.md)
-- [ ] Build a multi-variant skill (cookbook pattern)
-- [ ] Create a tool-enhanced skill
+- [x] Build a multi-variant skill (cookbook pattern)
+- [x] Create a tool-enhanced skill
 - [ ] Implement background agent orchestration
 - [ ] Set up context handoff pattern
 
@@ -111,17 +111,22 @@ Document your learning experiments here:
 ### Completed Experiments ✅
 
 - [x] Built comprehensive documentation system
-- [ ] _Your experiments will appear here_
+- [x] **Doc Vault Skill** - Auto-activating documentation cache with fresh API docs
+  - WebFetch integration for clean content extraction
+  - Auto-loads on first technical trigger per session
+  - Auto-consults cached docs when relevant
+  - Self-documenting with README.md index
+  - Context-optimized (only loads when needed)
+  - See: `.claude/skills/doc-vault/`
 
 ### In Progress 🔄
 
-- [ ] _What are you working on?_
+- [ ] _Nothing currently - ready for next experiment!_
 
 ### Planned 📋
 
 - [ ] Create personal slash commands collection
 - [ ] Build a code review skill
-- [ ] Experiment with background agents
 - [ ] Set up auto-format hooks
 - [ ] Install GitHub MCP server
 - [ ] Create custom database tool
@@ -245,7 +250,17 @@ Not sure where to start? Try these:
 - Set up repository structure
 - Ready to start hands-on learning!
 
-_Add your own notes as you learn..._
+**2025-12-11**: Phase 3 - Doc Vault Skill
+
+- Built auto-activating documentation cache (doc-vault)
+- Integrated WebFetch for clean content extraction
+- Learned auto-activation pattern (loads on first trigger)
+- Implemented context optimization (only loads when needed)
+- Created Python tool for README.md index management
+- Self-documenting system with frontmatter metadata
+- Tested with real TanStack Query docs
+- Iterated from complex registry to simple README index
+- Completed Phase 3 & advanced Phase 4 patterns!
 
 ---
 
