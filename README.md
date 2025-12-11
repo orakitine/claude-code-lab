@@ -39,7 +39,7 @@ Track your progress through Claude Code mastery:
 
 - [x] Create your first slash command
 - [x] Build a simple workflow skill
-- [ ] Write a custom tool
+- [x] Write a custom tool
 - [ ] Test the fork-terminal example skill
 
 ### Phase 3: Power Features ⚡
