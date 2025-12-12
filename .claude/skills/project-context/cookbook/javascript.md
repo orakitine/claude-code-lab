@@ -1,179 +1,62 @@
-# JavaScript/TypeScript Project Analysis Cookbook
+# JavaScript/TypeScript Project Analysis
 
-This cookbook defines the analysis workflow for JavaScript and TypeScript projects.
+Comprehensive analysis workflow for JavaScript and TypeScript projects.
 
-## Phase 1: Framework Detection 🔍
+## Workflow
 
-### Detect Framework and Stack
+1. **Detect Framework**
+   - Tool: Run `tools/detect_framework.py` on project root
+   - Checks for: Next.js, React+Vite, Vue, Svelte, Express, Nest.js, vanilla TS/JS
+   - Indicators: package.json dependencies, config files (next.config.js, vite.config.ts), directory structures
+   - Example: package.json has "vite" + "react" → {type: "nodejs", framework: "react-vite", language: "typescript"}
 
-- Use the `detect_framework` tool to identify the project framework
-- Tool will check for: Next.js, React+Vite, Vue, Svelte, Express, Nest.js, vanilla TS/JS
-- Tool returns: `{"type": "nodejs", "framework": "react-vite", "language": "typescript"}`
+2. **Analyze Dependencies**
+   - Tool: Run `tools/analyze_dependencies.py` on project root
+   - Extracts from package.json: runtime deps, dev deps, npm scripts, Node.js version
+   - Record: Key dependencies and purposes, available scripts (dev, build, test), notable packages
+   - Example: {runtime: ["react", "react-dom"], dev: ["vite", "typescript"], scripts: {dev: "vite", build: "vite build"}}
 
-### What to look for:
-- package.json dependencies
-- Config files (next.config.js, vite.config.ts, svelte.config.js)
-- Framework-specific directory structures
+3. **Map Directory Structure**
+   - Tool: Run `tools/analyze_structure.py` on project root
+   - Categorizes directories: source (src/, app/, components/), tests (__tests__, *.test.ts), config, docs, assets, build output
+   - Ignore: node_modules/, dist/, build/, .next/, .git/, hidden files (except .env.example)
+   - Example: {src: {file_count: 15, subdirs: ["components", "hooks"]}, tests: {file_count: 8}}
 
-## Phase 2: Dependencies Analysis 📦
+4. **Find Entry Points**
+   - Tool: Run `tools/find_entry_points.py` with detected framework
+   - Checks: package.json "main" field, common entries (main.ts, index.ts, app.ts), framework-specific (pages/_app.tsx for Next.js, src/App.tsx for React)
+   - Record: application entry, server entry (if backend), test entries, framework special files
+   - Example: ["src/main.tsx", "src/App.tsx", "index.html"]
 
-### Analyze Dependencies
+5. **Detect Patterns**
+   - Analyze structure and dependencies to identify architecture patterns
+   - Frontend: Component frameworks (React/Vue/Svelte), state management (Redux/Zustand/Context), styling (CSS-in-JS/Tailwind/Modules), routing
+   - Backend: API type (REST/GraphQL/tRPC), server framework (Express/Fastify/Nest.js/Hono), database (Prisma/TypeORM/Mongoose), auth (JWT/sessions)
+   - Testing: Framework (Vitest/Jest/Mocha), testing library (React Testing Library), E2E (Playwright/Cypress)
+   - Build: Bundler (Vite/Webpack/Rollup), package manager (npm/yarn/pnpm), monorepo (Turborepo/Nx)
+   - Example: Vite + React + TypeScript + Vitest detected → Modern React SPA pattern
 
-- Use the `analyze_dependencies` tool on the project
-- Tool reads package.json and extracts:
-  - Runtime dependencies
-  - Development dependencies
-  - Available npm scripts
-  - Node.js version requirements
+6. **Generate Report**
+   - Tool: Run `tools/generate_report.py` with all collected data
+   - Report sections: project overview, tech stack, directory structure, entry points, key dependencies, available scripts, detected patterns, dev workflow
+   - Output mode: IF user requested "save" → Write to .project-context.md, ELSE → Display in chat
+   - Example: Complete markdown report with all sections formatted
 
-### Record:
-- Key dependencies and their purposes
-- Build/dev/test scripts available
-- Any notable or unusual dependencies
-
-## Phase 3: Structure Analysis 🗂️
-
-### Map Directory Structure
-
-- Use the `analyze_structure` tool to intelligently map the project
-- Tool categorizes directories:
-  - Source code (src/, app/, pages/, components/)
-  - Tests (test/, tests/, __tests__/, *.test.ts)
-  - Configuration (config files, .env templates)
-  - Documentation (docs/, README.md)
-  - Assets (public/, static/, assets/)
-  - Build output (dist/, build/, .next/)
-
-### Ignore:
-- node_modules/
-- dist/, build/, .next/ (unless documenting build output location)
-- .git/
-- Hidden files (unless relevant like .env.example)
-
-## Phase 4: Entry Points Discovery 🚪
-
-### Find Entry Points
-
-- Use the `find_entry_points` tool to locate main files
-- Tool checks:
-  - package.json "main" field
-  - Common entry points: main.ts, index.ts, app.ts, server.ts
-  - Framework-specific: pages/_app.tsx (Next.js), src/App.tsx (React)
-  - Server files: server.js, index.js in root
-
-### Record:
-- Application entry point
-- Server entry point (if backend)
-- Test entry points
-- Framework-specific special files
-
-## Phase 5: Pattern Detection 🎯
-
-### Identify Patterns and Architecture
-
-Based on the structure and dependencies, identify:
-
-**Frontend Patterns:**
-- Component-based architecture (React, Vue, Svelte)
-- State management (Redux, Zustand, Context API, Pinia)
-- Styling approach (CSS-in-JS, CSS Modules, Tailwind, Styled-components)
-- Routing (React Router, Next.js routing, Vue Router)
-
-**Backend Patterns:**
-- API architecture (REST, GraphQL, tRPC)
-- Server framework (Express, Fastify, Nest.js, Hono)
-- Database access (Prisma, TypeORM, Mongoose, direct SQL)
-- Authentication (JWT, sessions, OAuth)
-
-**Testing Patterns:**
-- Test framework (Vitest, Jest, Mocha)
-- Testing library (React Testing Library, Vue Test Utils)
-- E2E testing (Playwright, Cypress)
-
-**Build/Deploy Patterns:**
-- Bundler (Vite, Webpack, Rollup, esbuild)
-- Package manager (npm, yarn, pnpm)
-- Monorepo (Turborepo, Nx, Lerna)
-
-## Phase 6: Generate Report 📊
-
-### Create Comprehensive Report
-
-- Use the `generate_report` tool with all gathered data
-- Tool will format the information into a structured markdown document
-
-### Report Structure:
-
-```markdown
-# Project Context: [project-name]
-
-**Generated:** [timestamp]
-**Type:** Node.js/TypeScript
-**Framework:** [detected framework]
-
-## Tech Stack
-[Dependencies organized by category]
-
-## Project Structure
-[Directory tree with annotations]
-
-## Entry Points
-[Main files that start the application]
-
-## Key Dependencies
-[Most important packages and their roles]
-
-## Available Scripts
-[npm scripts from package.json]
-
-## Patterns Detected
-[Architecture patterns, state management, styling, etc.]
-
-## Development Workflow
-[How to run, test, build the project]
-
----
-*Generated by Project Context Analyzer*
-```
-
-### Output Mode:
-
-- IF: User requested "save" or "save it"
-- THEN: Write report to `.project-context.md` in project root
-- ELSE: Display report in conversation
-
-## Example Tool Usage Sequence
+## Tool Sequence Example
 
 ```
-1. detect_framework(".")
-   → {"type": "nodejs", "framework": "react-vite", "language": "typescript"}
+detect_framework(".")
+  → {type: "nodejs", framework: "react-vite", language: "typescript"}
 
-2. analyze_dependencies(".")
-   → {"runtime": [...], "dev": [...], "scripts": {...}}
+analyze_dependencies(".")
+  → {runtime: [...], dev: [...], scripts: {...}}
 
-3. analyze_structure(".")
-   → {"src": {...}, "tests": {...}, "config": {...}}
+analyze_structure(".")
+  → {src: {...}, tests: {...}, config: {...}}
 
-4. find_entry_points(".", "react-vite")
-   → ["src/main.tsx", "src/App.tsx"]
+find_entry_points(".", "react-vite")
+  → ["src/main.tsx", "src/App.tsx"]
 
-5. generate_report({...all_data...}, output_mode="display")
-   → [formatted markdown report]
+generate_report({...all_data...}, "display")
+  → [formatted markdown report]
 ```
-
-## Success Criteria
-
-- ✓ Framework correctly identified
-- ✓ All major dependencies catalogued
-- ✓ Directory structure clearly mapped
-- ✓ Entry points located
-- ✓ Patterns accurately detected
-- ✓ Report is clear and actionable
-- ✓ Output matches user's request (display or save)
-
-## Notes
-
-- Focus on what's most important for understanding the project
-- Keep report concise but comprehensive
-- Highlight any unusual patterns or configurations
-- Provide enough context for someone new to understand the project quickly

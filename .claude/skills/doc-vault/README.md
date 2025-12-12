@@ -6,11 +6,14 @@ Fresh API documentation from official sources. This index is auto-loaded by the 
 
 ## Cached Documents
 
+### Claude Code Documentation
+- **claude-code-skills-reference** (2025-12-12) - Complete official reference for Skills: SKILL.md structure, trigger modes, cookbook pattern, allowed-tools, best practices, and examples
+
 ### TanStack Query
 - **tanstack-query-optimistic-updates** (2025-12-11) - Two strategies for optimistically updating UI before mutations complete - via UI or cache manipulation
 - **tanstack-query-options** (2025-12-11) - Query configuration helper for sharing queryKey and queryFn with type safety
 
 ---
 
-**Total:** 2 documents
-**Last updated:** 2025-12-11
+**Total:** 3 documents
+**Last updated:** 2025-12-12

@@ -1,46 +1,68 @@
 ---
 name: Fork Terminal Skill
 description: Fork a terminal session to a new terminal window. Use this when the user requests 'fork terminal' or 'create a new terminal' or 'new terminal: <command>' or 'fork session: <command>'.
+trigger: manual
+allowed-tools:
+  - Bash
+  - Read
 ---
 
 # Purpose
 
-Fork a terminal session to a new terminal window. Using one agentic coding tools or raw cli commands.
-Follow the `Instructions`, execute the `Workflow`, based on the `Cookbook`.
+Fork a terminal session to a new terminal window using agentic coding tools (Claude Code, Codex CLI, Gemini CLI) or raw CLI commands. Supports context handoff with conversation summary for agentic tools.
 
 ## Variables
 
-ENABLE_RAW_CLI_COMMANDS: true
-ENABLE_GEMINI_CLI: true
-ENABLE_CODEX_CLI: true
-ENABLE_CLAUDE_CODE: true
-AGENTIC_CODING_TOOLS: claude-code, codex-cli, gemini-cli
-
-## Instructions
-
-- Based on the user's request, follow the `Cookbook` to determine which tool to use.
-
-### Fork Summary User Prompts
-
-- IF: The user requests a fork terminal with a summary. This ONLY works for our agentic coding tools `AGENTIC_CODING_TOOLS`. The tool MUST BE enabled as well.
-- THEN: 
-  - Read, and REPLACE the `.claude/skills/fork-terminal/prompts/fork_summary_user_prompt.md` with the history of the conversation between you and the user so far. 
-  - Include the next users request in the `Next User Request` section.
-  - This will be what you pass into the PROMPT parameter of the agentic coding tool.
-  - IMPORTANT: To be clear, don't update the file directly, just read it, fill it out IN YOUR MEMORY and use it to craft a new prompt in the structure provided for the new fork agent.
-  - Let's be super clear here, the fork_summary_user_prompt.md is a template for you to fill out IN YOUR MEMORY. Once you've filled it out, pass that prompt to the agentic coding tool.
-  - XML Tags have been added to let you know exactly what you need to replace. You'll be replacing the <fill in the history here> and <fill in the next user request here> sections.
-- EXAMPLES:
-  - "fork terminal use claude code to <xyz> summarize work so far"
-  - "spin up a new terminal request <xyz> using claude code include summary"
-  - "create a new terminal to <xyz> with claude code with summary"
+ENABLE_RAW_CLI_COMMANDS: true    # Allow forking with raw CLI commands (ffmpeg, curl, python, etc.)
+ENABLE_GEMINI_CLI: true           # Enable Gemini CLI agent forking
+ENABLE_CODEX_CLI: true            # Enable Codex CLI agent forking
+ENABLE_CLAUDE_CODE: true          # Enable Claude Code agent forking
+AGENTIC_CODING_TOOLS: claude-code, codex-cli, gemini-cli  # List of supported agentic tools
 
 ## Workflow
 
-1. Understand the user's request.
-2. READ: `.claude/skills/fork-terminal/tools/fork_terminal.py` to understand our tooling.
-3. Follow the `Cookbook` to determine which tool to use.
-4. Execute the `.claude/skills/fork-terminal/tools/fork_terminal.py: fork_terminal(command: str)` tool.
+1. **Parse User Request**
+   - Extract: tool type (agentic vs raw CLI), tool name, command/task
+   - Check for "summary" keyword (context handoff for agentic tools)
+   - Example: "fork terminal use claude code to fix tests" → Tool: claude-code, Task: "fix tests", Summary: no
+
+2. **Read Fork Tool**
+   - Tool: Read `.claude/skills/fork-terminal/tools/fork_terminal.py`
+   - Understand forking mechanism and parameters
+   - Example: fork_terminal(command: str) → Spawns new terminal with command
+
+3. **Handle Summary Context (Agentic Tools Only)**
+   - IF: User requested summary (keywords: "summarize", "summary", "include context")
+   - AND: Tool is in AGENTIC_CODING_TOOLS (claude-code, codex-cli, gemini-cli)
+   - AND: Tool is enabled via ENABLE flag
+   - THEN: Apply summary workflow:
+     - Read `.claude/skills/fork-terminal/prompts/fork_summary_user_prompt.md` template
+     - Fill template IN MEMORY (IMPORTANT: don't update the file, fill it in memory only)
+     - Replace XML tags: <fill in the history here> with conversation history between you and user
+     - Replace XML tags: <fill in the next user request here> with the user's task
+     - This filled prompt will be passed to the PROMPT parameter (-p flag) of the agentic coding tool
+     - Template structure: Provides context handoff so new agent has conversation history
+   - ELSE: Use task as-is without summary (for raw CLI or when summary not requested)
+   - Summary examples:
+     - "fork terminal use claude code to fix tests summarize work so far"
+     - "spin up new terminal with codex include summary for refactoring"
+     - "create terminal with gemini with context to implement feature"
+   - Non-summary example: "fork terminal use claude code to run tests" → Direct task, no summary
+
+4. **Route to Cookbook**
+   - Determine scenario based on tool type and enabled flags
+   - Options: Raw CLI, Claude Code, Codex CLI, Gemini CLI
+   - Example: "claude code" requested + ENABLE_CLAUDE_CODE=true → Claude Code scenario
+
+5. **Execute Cookbook Scenario**
+   - Read and follow appropriate cookbook file
+   - Cookbook will construct the fork command
+   - Example: claude-code.md → Builds claude command with flags
+
+6. **Fork Terminal**
+   - Tool: Execute fork_terminal(command)
+   - Spawns new terminal window with constructed command
+   - Example: fork_terminal("claude --model sonnet -p 'fix tests'")
 
 ## Cookbook
 

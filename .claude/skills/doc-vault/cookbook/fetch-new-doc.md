@@ -1,45 +1,30 @@
-# Purpose
+# Fetch New Documentation
 
 Fetch fresh documentation from a URL and cache it for future use.
 
-## Variables
+## Workflow
 
-CACHE_DIR: .claude/skills/doc-vault/cache
-INDEX_TOOL: .claude/skills/doc-vault/tools/manage_index.py
+1. **Extract URL and Name**
+   - Parse user request for source URL and doc name
+   - Example: "save docs from https://zod.dev as zod-validation" → URL: zod.dev, Name: zod-validation
 
-## Instructions
+2. **Fetch Documentation**
+   - Tool: WebFetch with prompt: "Extract main documentation content. Focus on API reference, guides, code examples. Convert to clean markdown. Ignore navigation, footer, sidebars, ads. Include page title."
+   - Result: Clean markdown content
+   - Example: WebFetch https://zod.dev → Markdown content about Zod schema validation
 
-1. Extract the URL and doc name from the user's request
-2. Use the WebFetch tool to retrieve clean content:
-   - Prompt: "Extract the main documentation content. Focus on API reference, guides, and code examples. Convert to clean markdown. Ignore navigation, footer, sidebars, and ads. Include the page title."
-3. Save the fetched content to: `CACHE_DIR/<name>-YYYY-MM-DD.md`
-4. Include frontmatter metadata:
-   ```yaml
-   ---
-   url: <source-url>
-   fetched: YYYY-MM-DD
-   title: <page-title>
-   description: <one-sentence-description>
-   ---
-   ```
-5. Update the index by running: `INDEX_TOOL update "<name>" "<description>" "YYYY-MM-DD"`
-6. Confirm to user:
-   - ✓ Fetched and cached [Library] docs
-   - ✓ Saved to: cache/<name>-YYYY-MM-DD.md
-   - ✓ Updated doc vault index
+3. **Save to Cache**
+   - Save to: `CACHE_DIR/<name>-YYYY-MM-DD.md`
+   - Include frontmatter: url, fetched date, title, description
+   - If user didn't provide description: Extract from page title and first paragraph (one sentence)
+   - Example: Save to cache/zod-validation-2025-12-11.md with metadata
 
-## Description Guidelines
+4. **Update Index**
+   - Tool: Run INDEX_TOOL update command
+   - Command: `manage_index.py update "<name>" "<description>" "YYYY-MM-DD"`
+   - Example: manage_index.py update "zod-validation" "TypeScript-first schema validation" "2025-12-11"
 
-If user doesn't provide a description:
-- Extract from page title and first paragraph
-- Keep it one sentence
-- Focus on what the doc covers
-
-## Example Execution
-
-User: "save docs from https://zod.dev as zod-validation"
-
-1. WebFetch https://zod.dev
-2. Save to cache/zod-validation-2025-12-11.md with frontmatter
-3. Run: manage_index.py update "zod-validation" "TypeScript-first schema validation library"
-4. Confirm to user
+5. **Confirm to User**
+   - Report success with details
+   - Format: "✓ Fetched and cached <name> docs\n✓ Saved to: cache/<name>-YYYY-MM-DD.md\n✓ Updated doc vault index"
+   - Example: "✓ Fetched and cached Zod docs\n✓ Saved to: cache/zod-validation-2025-12-11.md\n✓ Updated doc vault index"

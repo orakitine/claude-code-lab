@@ -1,177 +1,83 @@
-# JavaScript/TypeScript Quality Gate Cookbook
+# JavaScript/TypeScript Quality Gate
 
-This cookbook defines the quality gate workflow for JavaScript and TypeScript projects.
+Comprehensive quality checks for JavaScript and TypeScript projects. Non-destructive - reports issues only.
 
-## Phase 1: Static Analysis 🔍
+## Workflow
 
-### Detect Available Scripts
+1. **Detect Available Tools**
+   - Tool: Read package.json to check available scripts and installed tools
+   - Look for: lint, format:check, type-check, test, build scripts
+   - Example: {scripts: {lint: "eslint .", test: "vitest run", build: "vite build"}}
 
-First, read `package.json` to see which scripts are available.
+2. **Run Linting**
+   - IF: package.json has "lint" script → Run `npm run lint`
+   - Record: All linting errors with file paths and line numbers
+   - Example: src/utils.ts:42:10 - 'foo' is assigned but never used
 
-### Run Linting
+3. **Run Format Check**
+   - IF: "format:check" or "prettier:check" script exists → Run that script
+   - ELSE IF: Prettier installed → Run `npx prettier --check "src/**/*.{ts,tsx,js,jsx}"`
+   - Record: All formatting issues with file paths
+   - Example: src/App.tsx needs formatting
 
-- IF: `package.json` has a `lint` script
-- THEN: Run `npm run lint`
-- RECORD: All linting errors with file paths and line numbers
+4. **Run Type Check**
+   - IF: "type-check" script exists → Run `npm run type-check`
+   - ELSE IF: tsconfig.json exists → Run `npx tsc --noEmit`
+   - Record: All type errors with file paths and line numbers
+   - Example: src/components/Button.tsx:12:5 - Type 'string' not assignable to 'number'
 
-### Run Format Check
+5. **Run Tests**
+   - IF: "test" script exists → Run `npm test` or `npm run test`
+   - Record: passed count, failed count, failed test names, error messages, execution time
+   - IMPORTANT: Continue to next phases even if tests fail
+   - Example: 45 passed, 2 failed - "should handle edge case" failed with [error]
 
-- IF: `package.json` has a `format:check` or `prettier:check` script
-- THEN: Run the format check script
-- ELSE IF: Prettier is installed
-- THEN: Run `npx prettier --check "src/**/*.{ts,tsx,js,jsx}"`
-- RECORD: All formatting issues
+6. **Run Build**
+   - IF: "build" script exists → Run `npm run build`
+   - Record: build success/failure, errors, bundle size (if shown), build time
+   - Optional: Clean up build artifacts after checking
+   - Example: Build failed - Cannot find module 'missing-import'
 
-### Run Type Check
+7. **Security Audit**
+   - IF: ENABLE_SECURITY_CHECK is true → Run `npm audit --production`
+   - Record: vulnerabilities by severity (critical/high/moderate/low), affected packages, recommended fixes
+   - NOTE: Only report, do NOT run `npm audit fix`
+   - Example: 2 critical, 5 high, 10 moderate vulnerabilities found
 
-- IF: `package.json` has a `type-check` script
-- THEN: Run `npm run type-check`
-- ELSE IF: `tsconfig.json` exists
-- THEN: Run `npx tsc --noEmit`
-- RECORD: All type errors with file paths and line numbers
+8. **Generate Report**
+   - Compile all results into formatted report
+   - Format: Phase sections (Static Analysis, Testing, Build, Security), overall status (PASS/FAIL/WARNINGS)
+   - Include: Specific file:line locations, error messages, actionable fix commands
+   - Example report:
+     ```
+     QUALITY GATE REPORT
+     Project: my-app | TypeScript
 
-## Phase 2: Testing 🧪
+     STATIC ANALYSIS
+       Linting: ✗ FAIL (5 issues)
+       Formatting: ✓ PASS
+       Type Check: ✗ FAIL (3 errors)
 
-### Run Tests
+     TESTING
+       Tests: ✓ PASS (45 passed)
+       Coverage: 78%
 
-- IF: `package.json` has a `test` script
-- THEN: Run `npm test` or `npm run test`
-- RECORD:
-  - Number of tests passed
-  - Number of tests failed
-  - Failed test names and error messages
-  - Test execution time
+     BUILD: ✓ PASS
+     SECURITY: ⚠ WARNINGS (2 critical vulns)
 
-### Check Coverage
+     OVERALL: ✗ FAILED
 
-- IF: `package.json` has a `test:coverage` or `coverage` script
-- THEN: Run the coverage script
-- RECORD: Coverage percentage if available
-- NOTE: Coverage is informational, not a failure criteria
+     ISSUES:
+     • src/utils.ts:42 - Unused variable
+     • src/types.ts:12 - Type mismatch
 
-**Important:** If tests fail, continue to next phases but mark overall as FAILED.
-
-## Phase 3: Build Verification 🏗️
-
-### Run Build
-
-- IF: `package.json` has a `build` script
-- THEN: Run `npm run build`
-- RECORD:
-  - Build success or failure
-  - Build errors if any
-  - Bundle size if displayed
-  - Build time
-
-**Important:** Clean up build artifacts after checking (optional).
-
-## Phase 4: Security & Dependencies 🔒
-
-### Security Audit
-
-- IF: `ENABLE_SECURITY_CHECK` is true
-- THEN: Run `npm audit --production`
-- RECORD:
-  - Number of vulnerabilities by severity (critical, high, moderate, low)
-  - Affected packages
-  - Recommended fixes
-
-**Note:** Only report, do NOT run `npm audit fix`.
-
-### Check for Outdated Dependencies (Optional)
-
-- Run `npm outdated` (informational only)
-- RECORD: Significantly outdated packages (major versions behind)
-
-## Phase 5: Generate Report 📊
-
-Create a comprehensive report in this format:
-
-```
-🚦 QUALITY GATE REPORT
-═══════════════════════════════════════
-
-📋 PROJECT: [project name from package.json]
-📁 DIRECTORY: [current directory]
-🕐 TIMESTAMP: [current time]
-🔧 DETECTED: JavaScript/TypeScript (Node.js)
-
-PHASE 1: STATIC ANALYSIS
-  ├─ Linting:        [✓ PASS | ✗ FAIL] ([X] issues)
-  ├─ Formatting:     [✓ PASS | ✗ FAIL] ([X] files need formatting)
-  └─ Type Checking:  [✓ PASS | ✗ FAIL] ([X] errors)
-
-PHASE 2: TESTING
-  ├─ Test Suite:     [✓ PASS | ✗ FAIL] ([X] passed, [Y] failed)
-  ├─ Duration:       [X.XX]s
-  └─ Coverage:       [XX%] (if available)
-
-PHASE 3: BUILD
-  ├─ Build Status:   [✓ PASS | ✗ FAIL]
-  └─ Bundle Size:    [XXX KB] (if available)
-
-PHASE 4: SECURITY
-  ├─ Audit:          [✓ PASS | ⚠ WARNINGS]
-  └─ Vulnerabilities: [X critical, Y high, Z moderate, W low]
-
-═══════════════════════════════════════
-OVERALL STATUS: [✓ PASSED | ✗ FAILED | ⚠ WARNINGS]
-═══════════════════════════════════════
-
-[If any failures:]
-
-❌ ISSUES FOUND:
-
-Linting Issues:
-  • file.ts:42:10 - [error message]
-  • file.ts:55:3 - [error message]
-
-Type Errors:
-  • component.tsx:12:5 - [error message]
-
-Failed Tests:
-  • Test: "should handle edge case" - [error message]
-
-Security Vulnerabilities:
-  • package-name: [severity] - [description]
-
-[End issues section]
-
-💡 RECOMMENDATIONS:
-
-[Provide specific commands to fix issues, such as:]
-  • Run `npm run lint:fix` to auto-fix linting issues
-  • Run `npm run format` to format code
-  • Fix type errors in [specific files]
-  • Review failing tests: [test names]
-  • Run `npm audit fix` to fix [X] vulnerabilities (review changes carefully)
-
-═══════════════════════════════════════
-```
-
-## Success Criteria
-
-- ✓ All phases attempted (even if some fail)
-- ✓ Clear, formatted report generated
-- ✓ Specific issues identified with file:line locations
-- ✓ Actionable recommendations provided
-- ✓ Overall PASS/FAIL status determined
+     RECOMMENDATIONS:
+     • Run `npm run lint:fix`
+     • Fix type errors in src/types.ts
+     • Run `npm audit fix`
+     ```
 
 ## Failure Criteria
 
-The quality gate FAILS if any of these conditions are met:
-- Linting errors found
-- Type checking errors found
-- Tests fail
-- Build fails
-
-The quality gate shows WARNINGS if:
-- High or critical security vulnerabilities found
-- Formatting issues found (can be auto-fixed)
-
-## Notes
-
-- This workflow is **non-destructive** - it only reports issues
-- Continue all phases even if early phases fail
-- Provide actionable next steps in recommendations
-- Be specific about file locations and error messages
+Gate FAILS if: Linting errors, type errors, tests fail, build fails
+Gate shows WARNINGS if: Critical/high security vulnerabilities, formatting issues

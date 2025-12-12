@@ -1,37 +1,53 @@
 ---
 name: Doc Vault Skill
 description: Auto-activating documentation cache with fresh API docs. Fetches and automatically consults cached documentation when user works with libraries/frameworks.
+trigger: auto
+allowed-tools:
+  - Read
+  - WebFetch
+  - Bash
+  - Write
 ---
 
 # Purpose
 
-Fetch and automatically consult cached documentation from official sources. Provides fresh, up-to-date API documentation that overrides stale training data.
-
-Follow the `Instructions`, execute the `Workflow`, based on the `Cookbook`.
+Fetch and automatically consult cached documentation from official sources. Provides fresh, up-to-date API documentation that overrides stale training data. Auto-triggers on "docs" keywords, maintains session-persistent index, and always prefers cached docs over training data.
 
 ## Variables
 
-CACHE_DIR: .claude/skills/doc-vault/cache
-INDEX_FILE: .claude/skills/doc-vault/README.md
-TRIGGER_SENSITIVITY: conservative
-CITE_SOURCES: true
-INDEX_TOOL: .claude/skills/doc-vault/tools/manage_index.py
-
-## Instructions
-
-- TRIGGER_SENSITIVITY is conservative: Only activates on explicit "docs" keywords
-- Once triggered in a session, INDEX_FILE stays loaded in context for entire session
-- Based on the user's request, follow the `Cookbook` to determine the appropriate action
-- IF CITE_SOURCES is true, always state source and date when using cached docs
-- Prefer cached docs over training data when available
+CACHE_DIR: .claude/skills/doc-vault/cache              # Where cached documentation files are stored
+INDEX_FILE: .claude/skills/doc-vault/README.md         # Lightweight registry of cached docs
+TRIGGER_SENSITIVITY: conservative                      # Options: conservative (explicit keywords only), aggressive (broader matching)
+CITE_SOURCES: true                                     # Always cite source URL and date when using cached docs
+INDEX_TOOL: .claude/skills/doc-vault/tools/manage_index.py  # Tool for managing the doc index
 
 ## Workflow
 
-1. Detect trigger (explicit "docs" keywords per conservative mode)
-2. IF first trigger in session, READ INDEX_FILE (loads into context, persists for session)
-3. Follow the `Cookbook` based on user's request
-4. Execute the appropriate cookbook scenario
-5. IF using cached docs, cite source and date
+1. **Detect Trigger**
+   - Check for "docs" or "documentation" keywords (conservative mode)
+   - Tool: Pattern matching on user input
+   - Example: "check the TanStack Query docs" → TRIGGERED
+
+2. **Load Index (First Trigger Only)**
+   - IF first trigger in session, READ INDEX_FILE
+   - Tool: Read `.claude/skills/doc-vault/README.md`
+   - Loads into context, persists for entire session
+   - Example: INDEX_FILE loaded → 3 cached docs available (TanStack Query, React, Zod)
+
+3. **Route to Cookbook**
+   - Analyze user request to determine action type
+   - Options: fetch new doc, consult cached doc, list available docs
+   - Example: "save docs from URL" → Fetch scenario, "check the docs" → Consult scenario
+
+4. **Execute Cookbook Scenario**
+   - Read and follow the appropriate cookbook file
+   - Tool: Read cookbook markdown and execute instructions
+   - Example: Consult scenario → Read cached doc → Provide answer with citation
+
+5. **Cite Sources**
+   - IF using cached docs and CITE_SOURCES is true
+   - Always state source URL and date
+   - Example: "According to TanStack Query docs (cached 2025-12-11 from https://tanstack.com/query/latest)..."
 
 ## Cookbook
 
@@ -63,13 +79,3 @@ INDEX_TOOL: .claude/skills/doc-vault/tools/manage_index.py
   - "list cached documentation"
   - "show me the doc vault"
   - "what's in the cache?"
-
-## Notes
-
-- Conservative mode: Only triggers on explicit "docs" keywords
-- Session persistence: Index loads once, stays for entire session
-- The skill learns over time (more docs = more useful)
-- Docs are dated so freshness is always visible
-- Index is lightweight (just list + descriptions)
-- WebFetch provides clean markdown (no HTML cruft)
-- Context-optimized (only loads when user says "docs")

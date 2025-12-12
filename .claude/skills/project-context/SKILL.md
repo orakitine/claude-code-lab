@@ -1,41 +1,70 @@
 ---
 name: Project Context Analyzer
 description: Analyzes project structure, dependencies, and patterns to generate comprehensive context documentation. Helps understand unfamiliar codebases quickly.
+trigger: both
+allowed-tools:
+  - Read
+  - Glob
+  - Bash
+  - Write
 ---
 
 # Purpose
 
-Analyze a project's structure, dependencies, framework, and patterns to generate a comprehensive context document. This helps with onboarding, understanding unfamiliar codebases, and providing context to other AI agents.
-
-Follow the `Instructions`, execute the `Workflow`, based on the `Cookbook`.
+Analyze a project's structure, dependencies, framework, and patterns to generate comprehensive context documentation. Helps with onboarding, understanding unfamiliar codebases, and providing context to other AI agents. Uses specialized analysis tools for deep project understanding.
 
 ## Variables
 
-ENABLE_JAVASCRIPT: true
-ENABLE_PYTHON: true
-ENABLE_GO: false
-OUTPUT_MODE: display  # "display" or "save"
-OUTPUT_FILE: .project-context.md
-SUPPORTED_PROJECT_TYPES: javascript, typescript, python
-
-## Instructions
-
-- Based on the project type detected, follow the `Cookbook` to determine which analysis workflow to use.
-- Use the custom tools in `tools/` directory to perform specialized analysis.
-- Output mode can be controlled by user request:
-  - "analyze project" or "show me project context" → display mode
-  - "generate project context and save" → save mode (creates .project-context.md)
-- Provide comprehensive but concise analysis.
-- Focus on what's most important for understanding the project quickly.
+ENABLE_JAVASCRIPT: true # Enable JavaScript/TypeScript project analysis
+ENABLE_PYTHON: true # Enable Python project analysis
+ENABLE_GO: false # Enable Go project analysis (not yet implemented)
+OUTPUT_MODE: display # Options: display (show results), save (write to file)
+OUTPUT_FILE: .project-context.md # Where to save report if OUTPUT_MODE is save
+SUPPORTED_PROJECT_TYPES: javascript, typescript, python # Currently supported project types
 
 ## Workflow
 
-1. Understand the user's request to analyze the project.
-2. Detect the project type using the `detect_framework` tool.
-3. Follow the appropriate `Cookbook` based on project type.
-4. Call analysis tools in sequence to gather information.
-5. Aggregate results and generate formatted report.
-6. Display or save based on user request.
+1. **Parse User Request**
+
+   - Determine intent: analyze, generate, show project context
+   - Determine output mode: display or save
+   - Display mode triggers: "analyze project", "show me project context", "what is this project"
+   - Save mode triggers: "generate project context and save", "save project context"
+   - Example: "analyze this project" → Intent: analyze, Mode: display
+
+2. **Detect Project Type**
+
+   - Tool: Run `tools/detect_framework.py`
+   - Checks for: package.json (JS/TS), requirements.txt/pyproject.toml (Python), go.mod (Go)
+   - Returns: {type, framework, language, confidence}
+   - Example: package.json found → {type: "nodejs", framework: "react-vite", language: "typescript", confidence: "high"}
+
+3. **Route to Cookbook**
+
+   - Based on detected type and ENABLE flags
+   - JavaScript/TypeScript: IF package.json AND ENABLE_JAVASCRIPT → javascript.md
+   - Python: IF requirements.txt/pyproject.toml AND ENABLE_PYTHON → python.md
+   - Unknown: IF no match → Basic analysis with Glob/Read
+   - Example: TypeScript project detected + ENABLE_JAVASCRIPT=true → Route to cookbook/javascript.md
+
+4. **Execute Analysis Tools**
+
+   - Tools in `tools/` directory perform specialized analysis
+   - Sequence depends on cookbook (see cookbook files for specifics)
+   - Common tools: detect_framework, analyze_dependencies, analyze_structure, find_entry_points
+   - Example: JavaScript project → Run npm analysis, find React components, analyze package.json
+
+5. **Aggregate Results**
+
+   - Combine data from all analysis tools
+   - Generate formatted report with sections: overview, structure, dependencies, entry points
+   - Keep comprehensive but concise (focus on what's important)
+   - Example: Combine framework info + dependencies + structure → Complete context document
+
+6. **Output Report**
+   - IF OUTPUT_MODE is "display" OR user requested display: Show results in chat
+   - IF OUTPUT_MODE is "save" OR user requested save: Write to OUTPUT_FILE
+   - Example: "show me context" → Display in chat, "generate and save" → Write to .project-context.md
 
 ## Cookbook
 
@@ -43,22 +72,11 @@ SUPPORTED_PROJECT_TYPES: javascript, typescript, python
 
 - IF: The project has a `package.json` file AND `ENABLE_JAVASCRIPT` is true.
 - THEN: Read and execute: `.claude/skills/project-context/cookbook/javascript.md`
-- EXAMPLES:
-  - "analyze this project"
-  - "generate project context"
-  - "what is this project about"
-  - "show me project context"
-  - "generate project context and save it"
 
 ### Python Projects
 
 - IF: The project has `requirements.txt` or `pyproject.toml` AND `ENABLE_PYTHON` is true.
 - THEN: Read and execute: `.claude/skills/project-context/cookbook/python.md`
-- EXAMPLES:
-  - "analyze this project"
-  - "what's the project structure"
-  - "generate project context"
-  - "show me the Django app structure"
 
 ### Unknown Project Type
 

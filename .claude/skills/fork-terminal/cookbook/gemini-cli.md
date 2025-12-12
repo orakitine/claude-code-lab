@@ -1,17 +1,40 @@
-# Purpose
+# Gemini CLI Agent Fork
 
-Create a new Gemini CLI agent to execute the command.
+Create a new Gemini CLI agent in a forked terminal to execute the task.
 
 ## Variables
 
-DEFAULT_MODEL: gemini-2.5-pro
-HEAVY_MODEL: gemini-3-pro-preview
-BASE_MODEL: gemini-2.5-pro
-FAST_MODEL: gemini-2.5-flash
+DEFAULT_MODEL: gemini-2.5-pro          # Default model if not specified by user
+HEAVY_MODEL: gemini-3-pro-preview      # Model for "heavy" tasks
+BASE_MODEL: gemini-2.5-pro             # Base/standard model
+FAST_MODEL: gemini-2.5-flash           # Model for "fast" tasks
 
-## Instructions
+## Workflow
 
-- Before executing the command, run `gemini --help` to understand the command and its options.
-- Always use interactive mode with the -i flag as the last flag, right before the prompt (e.g., `gemini --model gemini-2.5-flash -y -i "prompt here"`)
-- For the --model argument, use the DEFAULT_MODEL if not specified. If 'fast' is requested, use the FAST_MODEL. If 'heavy' is requested, use the HEAVY_MODEL.
-- Always run with `--yolo` (or `-y` for short)
+1. **Check Gemini CLI**
+   - Tool: Run `gemini --help` to understand available options
+   - Verify Gemini CLI is installed and accessible
+   - Example: `gemini --help` → Shows available flags and usage
+
+2. **Extract Task**
+   - Parse user's request for the task/prompt
+   - Will be passed after `-i` flag (interactive mode)
+   - Example: "fork gemini to analyze code" → Task: "analyze code"
+
+3. **Determine Model**
+   - IF: User specifies "fast" → Use FAST_MODEL (gemini-2.5-flash)
+   - IF: User specifies "heavy" → Use HEAVY_MODEL (gemini-3-pro-preview)
+   - ELSE: Use DEFAULT_MODEL (gemini-2.5-pro)
+   - Example: "fork with gemini fast to review PR" → Model: gemini-2.5-flash
+
+4. **Construct Command**
+   - Format: `gemini --model <model> --yolo -i "<task>"`
+   - OR short form: `gemini --model <model> -y -i "<task>"`
+   - `-i` flag MUST be last flag before the prompt (interactive mode)
+   - Always include `--yolo` (or `-y`) flag
+   - Example: `gemini --model gemini-2.5-flash -y -i "implement authentication"`
+
+5. **Execute Fork**
+   - Tool: Call fork_terminal(command) with constructed command
+   - Spawns new terminal with Gemini CLI agent in interactive mode
+   - Example: fork_terminal("gemini --model gemini-2.5-pro --yolo -i 'add error handling'")
