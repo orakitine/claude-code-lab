@@ -1,246 +1,75 @@
-# Doc Vault Skill
-
-Auto-activating documentation cache. Provides fresh, up-to-date API documentation that overrides stale training data.
-
-## Purpose
-
-Fetch and automatically consult cached documentation from official sources. When user works with libraries/frameworks, automatically use the latest cached docs instead of potentially outdated training data.
-
-## Triggers
-
-### Auto-Activation Triggers (loads index on first use)
-- Library/framework names: "TanStack Query", "Prisma", "React", "Next.js", "Zod", etc.
-- Doc keywords: "latest docs", "fresh docs", "according to docs", "api reference"
-- Technical implementation: "implement", "configure", "set up" (with technical context)
-
-### Cache Management Triggers (explicit)
-- "save docs from <URL> as <name>"
-- "cache docs: <URL>"
-- "add to doc vault: <URL>"
-
-## Auto-Activation Behavior
-
-### First Trigger in Session
-
-When ANY trigger detected for the first time in a conversation:
-
-1. **Load the index:**
-   - Read `.claude/skills/doc-vault/README.md`
-   - Load cache index into context memory
-   - Index stays loaded for remainder of session
-
-2. **Announce activation (optional):**
-   ```
-   "Doc vault activated. Fresh docs available:
-    • TanStack Query Options (2025-12-11)
-    • Prisma Migrations (2025-12-10)
-    • [etc.]"
-   ```
-   OR silently activate (just use docs without announcement)
-
-3. **Search for relevant docs:**
-   - Check if user query matches any cached doc
-   - Match by: library name, keywords in description, topic
-
-4. **Auto-consult if found:**
-   - Read the full cached doc
-   - Use it as authoritative reference
-   - Always mention: "Using cached [Library] docs (YYYY-MM-DD)"
-
-### Subsequent Triggers in Same Session
-
-Once index is loaded:
-
-1. **Skip re-loading** (index already in context)
-2. **Search index** for relevant docs
-3. **Auto-consult** matching docs
-4. **Cite source** and date
-
-## Automatic Consultation
-
-Once doc vault is active (index loaded):
-
-**ALWAYS:**
-- Check cache first when user mentions technical topics
-- Prefer cached docs over training data
-- Auto-consult without asking permission
-- Mention what docs were used: "Using cached X docs (YYYY-MM-DD)"
-- Be transparent about sources
-
-**MATCHING:**
-- Library names: "TanStack Query" → find "tanstack-query-options"
-- Keywords: "migrations" → search descriptions for "migration"
-- Topics: "caching", "validation", etc. → match to relevant docs
-- Best match: Use most relevant doc automatically
-
-**TRANSPARENCY:**
-Always state when cached docs are used:
-- "Using cached TanStack Query docs (2025-12-11)"
-- "According to cached Prisma docs (2025-12-10)"
-- User always knows the source
-
-## Cache Management
-
-### Adding New Docs
-
-When user says: "save docs from <URL> as <name>"
-
-**Steps:**
-
-1. **Fetch content:**
-   - Use WebFetch tool with prompt:
-     "Extract the main documentation content. Focus on API reference, guides, and code examples. Convert to clean markdown. Ignore navigation, footer, sidebars, and ads."
-
-2. **Save to cache:**
-   - File: `.claude/skills/doc-vault/cache/<name>-YYYY-MM-DD.md`
-   - Include frontmatter:
-     ```yaml
-     ---
-     url: <source-url>
-     fetched: YYYY-MM-DD
-     title: <page-title>
-     description: <one-sentence-description>
-     ---
-     ```
-
-3. **Update index:**
-   - Edit `.claude/skills/doc-vault/README.md`
-   - Add new entry with description
-   - Update total count and timestamp
-   - Group by library/framework if applicable
-
-4. **Update in-memory index:**
-   - If index already loaded, update the in-context version
-   - New doc immediately available for consultation
-
-5. **Confirm to user:**
-   ```
-   ✓ Fetched and cached [Library] docs
-   ✓ Saved to: cache/<name>-YYYY-MM-DD.md
-   ✓ Updated doc vault index
-   ✓ Available for use
-   ```
-
-### File Naming
-
-- User provides base name: `"save docs as tanstack-query-options"`
-- You append date: `tanstack-query-options-2025-12-11.md`
-- Dated files ensure freshness is visible
-
-### Description
-
-If user doesn't provide description:
-- Auto-extract from page title + first paragraph
-- Or use: `"<Library> documentation"`
-- Keep it one sentence, descriptive
-
-### Multiple Versions
-
-If doc with same base name exists:
-- Create new dated version (don't overwrite old)
-- Update README.md to show only latest
-- Old versions remain in cache/ (historical reference)
-
-## Context Optimization
-
-**When skill triggers:**
-- First trigger: Load index (~small overhead)
-- Subsequent: Index already in context (no overhead)
-
-**When skill doesn't trigger:**
-- No library names mentioned
-- No technical keywords
-- Skill stays dormant
-- No index loaded
-- Saves context window
-
-## Example Workflows
-
-### Example 1: Auto-activate and use
-
-```
-User: "Implement query caching with 5-minute staleTime"
-
-Skill:
-  - Detects "query caching" (technical + potentially cached)
-  - First trigger → loads README.md index
-  - Finds "tanstack-query-options" in index
-  - Reads cache/tanstack-query-options-2025-12-11.md
-  - Uses it for implementation
-
-Response:
-  "Using cached TanStack Query docs (2025-12-11)
-
-   Here's how to implement query caching with staleTime:
-   [implementation using fresh docs]"
-```
-
-### Example 2: Add new doc mid-session
-
-```
-User: "Save docs from https://zod.dev as zod-validation"
-
-Skill:
-  - Loads index (if not loaded)
-  - Fetches via WebFetch
-  - Saves to cache/zod-validation-2025-12-11.md
-  - Updates README.md
-  - Updates in-memory index
-
-Response:
-  "✓ Fetched and cached Zod docs
-   ✓ Saved to: cache/zod-validation-2025-12-11.md
-   ✓ Updated doc vault index"
-
+---
+name: Doc Vault Skill
+description: Auto-activating documentation cache with fresh API docs. Fetches and automatically consults cached documentation when user works with libraries/frameworks.
 ---
 
-User: "Add Zod validation to the form"
+# Purpose
 
-Skill:
-  - Index already loaded
-  - Finds newly added zod-validation
-  - Reads and uses it
+Fetch and automatically consult cached documentation from official sources. Provides fresh, up-to-date API documentation that overrides stale training data.
 
-Response:
-  "Using cached Zod docs (2025-12-11)
-   [implementation]"
-```
+Follow the `Instructions`, execute the `Workflow`, based on the `Cookbook`.
 
-### Example 3: No activation when not needed
+## Variables
 
-```
-User: "Refactor variable names for clarity"
+CACHE_DIR: .claude/skills/doc-vault/cache
+INDEX_FILE: .claude/skills/doc-vault/README.md
+TRIGGER_SENSITIVITY: conservative
+CITE_SOURCES: true
+INDEX_TOOL: .claude/skills/doc-vault/tools/manage_index.py
 
-Skill:
-  - No triggers detected
-  - Doesn't activate
-  - No index loaded
-  - Saves context window
+## Instructions
 
-Response:
-  [Normal refactoring without doc vault]
-```
+- TRIGGER_SENSITIVITY is conservative: Only activates on explicit "docs" keywords
+- Once triggered in a session, INDEX_FILE stays loaded in context for entire session
+- Based on the user's request, follow the `Cookbook` to determine the appropriate action
+- IF CITE_SOURCES is true, always state source and date when using cached docs
+- Prefer cached docs over training data when available
 
-## Files
+## Workflow
 
-- **Index:** `.claude/skills/doc-vault/README.md` (auto-loaded on first trigger)
-- **Cache:** `.claude/skills/doc-vault/cache/*.md` (dated docs with frontmatter)
-- **Tool:** `.claude/skills/doc-vault/tools/manage_docs.py` (WebFetch + save + update)
+1. Detect trigger (explicit "docs" keywords per conservative mode)
+2. IF first trigger in session, READ INDEX_FILE (loads into context, persists for session)
+3. Follow the `Cookbook` based on user's request
+4. Execute the appropriate cookbook scenario
+5. IF using cached docs, cite source and date
 
-## Best Practices
+## Cookbook
 
-1. **Always cite sources** - User should know when cached docs are used
-2. **Prefer cached over training** - Fresh docs beat stale memory
-3. **Auto-consult, don't ask** - Seamless experience
-4. **Be transparent** - State doc source and date
-5. **Keep descriptions short** - One sentence in README.md
-6. **Date all files** - Freshness should be visible
-7. **Update index atomically** - Add doc + update README together
+### Fetch New Documentation
+
+- IF: User provides URL with "save docs from" or "cache docs"
+- THEN: Read and execute `.claude/skills/doc-vault/cookbook/fetch-new-doc.md`
+- EXAMPLES:
+  - "save docs from https://zod.dev as zod-validation"
+  - "cache docs: https://prisma.io/docs/orm as prisma-orm"
+  - "add to doc vault: https://trpc.io/docs as trpc-api"
+
+### Consult Cached Documentation
+
+- IF: User mentions "docs" OR "documentation" OR "api reference" (conservative trigger)
+- THEN: Read and execute `.claude/skills/doc-vault/cookbook/consult-cached.md`
+- EXAMPLES:
+  - "check the TanStack Query docs and implement caching"
+  - "according to the latest Prisma docs, add migrations"
+  - "consult the React docs for Suspense"
+  - "use fresh Zod docs for validation"
+
+### List Available Documentation
+
+- IF: User asks what documentation is cached
+- THEN: Read and execute `.claude/skills/doc-vault/cookbook/list-docs.md`
+- EXAMPLES:
+  - "what docs do we have?"
+  - "list cached documentation"
+  - "show me the doc vault"
+  - "what's in the cache?"
 
 ## Notes
 
-- This skill learns over time (more docs = more useful)
+- Conservative mode: Only triggers on explicit "docs" keywords
+- Session persistence: Index loads once, stays for entire session
+- The skill learns over time (more docs = more useful)
 - Docs are dated so freshness is always visible
 - Index is lightweight (just list + descriptions)
-- WebFetch provides clean markdown (better than crude scraping)
-- User never needs to manually activate (auto-loads on first use)
+- WebFetch provides clean markdown (no HTML cruft)
+- Context-optimized (only loads when user says "docs")
