@@ -12,4 +12,4 @@ COMMIT_MESSAGE
 - ELSE:
   - Review the changes
   - write an appropriate commit message
-  - Commit the code
+- Commit the code
