@@ -1,6 +1,11 @@
 # Python Project Analysis
 
-Comprehensive analysis workflow for Python projects.
+Comprehensive analysis workflow for Python projects. Uses parallel agent execution for faster analysis.
+
+## Variables
+
+ENABLE_PARALLEL_EXECUTION: true       # Use parallel agent swarm for faster analysis
+MAX_PARALLEL_AGENTS: 3                # Maximum agents to run simultaneously
 
 ## Workflow
 
@@ -10,33 +15,27 @@ Comprehensive analysis workflow for Python projects.
    - Indicators: requirements.txt/pyproject.toml, framework-specific files (manage.py for Django), common packages, structure patterns
    - Example: manage.py found + django in requirements → {type: "python", framework: "django", language: "python"}
 
-2. **Analyze Dependencies**
-   - Tool: Run `tools/analyze_dependencies.py` on project root
-   - Reads requirements.txt or pyproject.toml: runtime deps, version constraints, dev deps (if separated)
-   - Record: Key packages and purposes, version specs, notable packages
-   - Common categories: Web frameworks (Django/Flask/FastAPI), testing (pytest/unittest), linting (black/ruff/pylint), data science (numpy/pandas), database (SQLAlchemy/psycopg2/pymongo)
-   - Example: {runtime: ["django==4.2", "djangorestframework", "psycopg2-binary"], dev: ["pytest", "black"]}
+2. **Launch Parallel Analysis Swarm**
+   - IF: ENABLE_PARALLEL_EXECUTION is true → Launch all analysis tasks as parallel background agents
+   - Tool: Task with run_in_background: true for each analysis task
+   - Agents to spawn:
+     - Agent "DependencyAnalyzer": Run `tools/analyze_dependencies.py` on project root
+     - Agent "StructureMapper": Run `tools/analyze_structure.py` on project root
+     - Agent "EntryPointFinder": Run `tools/find_entry_points.py` with detected framework
+   - Each agent runs independently and returns analysis results
+   - Example: 3 agents launch simultaneously → All complete in ~4s (vs ~9s sequential)
 
-3. **Map Directory Structure**
-   - Tool: Run `tools/analyze_structure.py` on project root
-   - Categorizes directories: source (src/, app/, main package), tests (test/, *_test.py), config (setup.py, pyproject.toml), docs, data, scripts
-   - Django: manage.py, multiple app dirs, settings.py/urls.py/wsgi.py
-   - Flask: app.py/application.py, templates/, static/, flatter structure
-   - FastAPI: main.py, routers/, models/
-   - Package: setup.py/pyproject.toml, src/ or package_name/, tests/
-   - Ignore: __pycache__/, *.pyc, .pytest_cache/, venv/, env/, dist/, build/, *.egg-info/, .git/
-   - Example: {source: {manage.py, apps: ["users", "api"]}, tests: {test/}, config: ["settings.py"]}
+3. **Collect Swarm Results**
+   - Tool: TaskOutput for each agent to retrieve results
+   - Wait for all agents to complete (block: true)
+   - Parse each agent's output:
+     - DependencyAnalyzer: {runtime: [...], dev: [...], categories: {...}}
+     - StructureMapper: {source: {...}, tests: {...}, config: [...], docs: [...]}
+     - EntryPointFinder: ["manage.py", "myproject/settings.py", "myproject/wsgi.py"]
+   - Example: All agents complete → Combined data ready for pattern detection
 
-4. **Find Entry Points**
-   - Tool: Run `tools/find_entry_points.py` with detected framework
-   - Django: manage.py, settings.py, urls.py, wsgi.py/asgi.py
-   - Flask: app.py/main.py, wsgi.py
-   - FastAPI: main.py (creates app = FastAPI())
-   - CLI tools: __main__.py, entry points in setup.py/pyproject.toml
-   - Example: ["manage.py", "myproject/settings.py", "myproject/wsgi.py"]
-
-5. **Detect Patterns**
-   - Analyze structure and dependencies to identify architecture patterns
+4. **Detect Patterns**
+   - Analyze collected structure and dependencies to identify architecture patterns
    - Web: Django MTV (Model-Template-View), Flask Blueprint-based, FastAPI Router-based
    - Testing: pytest (most common), unittest, tox, coverage tools (coverage.py, pytest-cov)
    - Database: Django ORM/SQLAlchemy (ORM), psycopg2/pymongo (direct), alembic/Django migrations
@@ -45,11 +44,13 @@ Comprehensive analysis workflow for Python projects.
    - Async: asyncio, FastAPI (async by default), Django async views
    - Example: Django + DRF + PostgreSQL + Celery → REST API with background tasks
 
-6. **Generate Report**
+5. **Generate Report**
    - Tool: Run `tools/generate_report.py` with all collected data
    - Report sections: project overview, tech stack, directory structure, entry points, key dependencies, dev setup, detected patterns, dev workflow
-   - Output mode: IF user requested "save" → Write to .project-context.md, ELSE → Display in chat
-   - Example: Complete markdown report with Python-specific sections (virtual env, package vs app)
+   - Output mode: IF user requested "save" → Write to OUTPUT_FILE, ELSE → Display in chat
+   - Show execution time comparison if parallel execution was used
+   - Include Python-specific sections: virtual env setup, package vs application structure
+   - Example report shows: "Analysis completed in 6s (29% faster than sequential 9s execution)"
 
 ## Tool Sequence Example
 
@@ -57,15 +58,17 @@ Comprehensive analysis workflow for Python projects.
 detect_framework(".")
   → {type: "python", framework: "django", language: "python"}
 
-analyze_dependencies(".")
-  → {runtime: [...], dev: [...]}
+PARALLEL SWARM:
+├─ analyze_dependencies(".")      → {runtime: [...], dev: [...]}
+├─ analyze_structure(".")         → {source: {...}, tests: {...}, config: {...}}
+└─ find_entry_points(".", "django")  → ["manage.py", "settings.py", "wsgi.py"]
 
-analyze_structure(".")
-  → {source: {...}, tests: {...}, config: {...}}
+collect_results()
+  → {dependencies: {...}, structure: {...}, entry_points: [...]}
 
-find_entry_points(".", "django")
-  → ["manage.py", "settings.py", "wsgi.py"]
+detect_patterns({...all_data...})
+  → {web: "Django MTV", api: "DRF", database: "PostgreSQL + ORM"}
 
 generate_report({...all_data...}, "display")
-  → [formatted markdown report]
+  → [formatted markdown report with performance metrics]
 ```

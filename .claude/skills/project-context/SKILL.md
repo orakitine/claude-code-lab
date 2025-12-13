@@ -1,25 +1,28 @@
 ---
 name: Project Context Analyzer
-description: Analyzes project structure, dependencies, and patterns to generate comprehensive context documentation. Helps understand unfamiliar codebases quickly.
+description: Analyzes project structure, dependencies, and patterns to generate comprehensive context documentation. Uses parallel agent execution for faster analysis. Helps understand unfamiliar codebases quickly.
 trigger: both
 allowed-tools:
   - Read
   - Glob
   - Bash
   - Write
+  - Task
+  - TaskOutput
 ---
 
 # Purpose
 
-Analyze a project's structure, dependencies, framework, and patterns to generate comprehensive context documentation. Helps with onboarding, understanding unfamiliar codebases, and providing context to other AI agents. Uses specialized analysis tools for deep project understanding.
+Analyze a project's structure, dependencies, framework, and patterns to generate comprehensive context documentation. Uses parallel agent swarm execution for blazing-fast analysis. Helps with onboarding, understanding unfamiliar codebases, and providing context to other AI agents. Uses specialized analysis tools for deep project understanding.
 
 ## Variables
 
-ENABLE_JAVASCRIPT: true # Enable JavaScript/TypeScript project analysis
-ENABLE_PYTHON: true # Enable Python project analysis
-ENABLE_GO: false # Enable Go project analysis (not yet implemented)
-OUTPUT_MODE: display # Options: display (show results), save (write to file)
-OUTPUT_FILE: .project-context.md # Where to save report if OUTPUT_MODE is save
+ENABLE_JAVASCRIPT: true           # Enable JavaScript/TypeScript project analysis
+ENABLE_PYTHON: true               # Enable Python project analysis
+ENABLE_GO: false                  # Enable Go project analysis (not yet implemented)
+ENABLE_PARALLEL_EXECUTION: true   # Use parallel agent swarm for faster analysis
+OUTPUT_MODE: display              # Options: display (show results), save (write to file)
+OUTPUT_FILE: .project-context.md  # Where to save report if OUTPUT_MODE is save
 SUPPORTED_PROJECT_TYPES: javascript, typescript, python # Currently supported project types
 
 ## Workflow
@@ -49,17 +52,20 @@ SUPPORTED_PROJECT_TYPES: javascript, typescript, python # Currently supported pr
 
 4. **Execute Analysis Tools**
 
+   - IF: ENABLE_PARALLEL_EXECUTION is true → Launch parallel agent swarm for analysis tasks
    - Tools in `tools/` directory perform specialized analysis
-   - Sequence depends on cookbook (see cookbook files for specifics)
+   - Tool: Task with run_in_background: true for each analysis task
+   - Agents: DependencyAnalyzer, StructureMapper, EntryPointFinder run simultaneously
    - Common tools: detect_framework, analyze_dependencies, analyze_structure, find_entry_points
-   - Example: JavaScript project → Run npm analysis, find React components, analyze package.json
+   - Example: JavaScript project → Launch 3 parallel agents (dependencies, structure, entry points) → All complete in ~4s vs ~9s sequential
 
 5. **Aggregate Results**
 
+   - IF parallel execution used → Collect all agent results using TaskOutput
    - Combine data from all analysis tools
    - Generate formatted report with sections: overview, structure, dependencies, entry points
    - Keep comprehensive but concise (focus on what's important)
-   - Example: Combine framework info + dependencies + structure → Complete context document
+   - Example: Collect swarm results → Combine framework info + dependencies + structure → Complete context document with performance metrics
 
 6. **Output Report**
    - IF OUTPUT_MODE is "display" OR user requested display: Show results in chat
