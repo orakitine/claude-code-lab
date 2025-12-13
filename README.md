@@ -46,14 +46,14 @@ Track your progress through Claude Code mastery:
 
 - [x] Read [Background Agents Guide](docs/concepts/background-agents.md)
 - [x] Experiment with parallel task execution
-- [ ] Read [Hooks Guide](docs/concepts/hooks.md)
-- [ ] Set up an automation hook
-- [ ] Read [MCP Servers Guide](docs/concepts/mcp-servers.md)
-- [ ] Install and test an MCP server
+- [x] Read [Hooks Guide](docs/concepts/hooks.md)
+- [x] Set up an automation hook
+- [x] Read [MCP Servers Guide](docs/concepts/mcp-servers.md)
+- [x] Install and test an MCP server
 
 ### Phase 4: Advanced Patterns 🚀
 
-- [ ] Study [Skill Patterns](docs/examples/skill-patterns.md)
+- [x] Study [Skill Patterns](docs/examples/skill-patterns.md)
 - [x] Build a multi-variant skill (cookbook pattern)
 - [x] Create a tool-enhanced skill
 - [ ] Implement background agent orchestration

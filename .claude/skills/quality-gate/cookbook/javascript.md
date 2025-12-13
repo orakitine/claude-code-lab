@@ -1,80 +1,87 @@
 # JavaScript/TypeScript Quality Gate
 
-Comprehensive quality checks for JavaScript and TypeScript projects. Non-destructive - reports issues only.
+Comprehensive quality checks for JavaScript and TypeScript projects. Non-destructive - reports issues only. Uses parallel agent execution for maximum speed.
+
+## Variables
+
+ENABLE_PARALLEL_EXECUTION: true       # Use swarm pattern for parallel checks (faster)
+MAX_PARALLEL_AGENTS: 6                # Maximum agents to run simultaneously
 
 ## Workflow
 
 1. **Detect Available Tools**
    - Tool: Read package.json to check available scripts and installed tools
    - Look for: lint, format:check, type-check, test, build scripts
-   - Example: {scripts: {lint: "eslint .", test: "vitest run", build: "vite build"}}
+   - Determine which checks can run based on available tooling
+   - Example: {scripts: {lint: "eslint .", test: "vitest run", build: "vite build"}} → Can run lint, test, build checks
 
-2. **Run Linting**
-   - IF: package.json has "lint" script → Run `npm run lint`
-   - Record: All linting errors with file paths and line numbers
-   - Example: src/utils.ts:42:10 - 'foo' is assigned but never used
+2. **Launch Parallel Quality Check Swarm**
+   - IF: ENABLE_PARALLEL_EXECUTION is true → Launch all checks as parallel background agents
+   - Tool: Task with run_in_background: true for each check
+   - Agents to spawn (based on available tools):
+     - Agent "Linter": IF lint script exists → Run `npm run lint`
+     - Agent "Formatter": IF format:check exists → Run `npm run format:check` ELSE IF prettier installed → Run `npx prettier --check "src/**/*.{ts,tsx,js,jsx}"`
+     - Agent "TypeChecker": IF type-check exists → Run `npm run type-check` ELSE IF tsconfig.json → Run `npx tsc --noEmit`
+     - Agent "Tester": IF test script exists → Run `npm test`
+     - Agent "Builder": IF build script exists → Run `npm run build`
+     - Agent "Security": IF ENABLE_SECURITY_CHECK → Run `npm audit --production`
+   - Each agent runs independently and returns results
+   - Example: 6 agents launch simultaneously → All complete in ~15s (vs ~60s sequential)
 
-3. **Run Format Check**
-   - IF: "format:check" or "prettier:check" script exists → Run that script
-   - ELSE IF: Prettier installed → Run `npx prettier --check "src/**/*.{ts,tsx,js,jsx}"`
-   - Record: All formatting issues with file paths
-   - Example: src/App.tsx needs formatting
+3. **Collect Swarm Results**
+   - Tool: TaskOutput for each agent to retrieve results
+   - Wait for all agents to complete (block: true)
+   - Parse each agent's output for errors, warnings, and status
+   - Example: Linter agent returns "5 errors in src/utils.ts", Formatter returns "All files formatted correctly"
 
-4. **Run Type Check**
-   - IF: "type-check" script exists → Run `npm run type-check`
-   - ELSE IF: tsconfig.json exists → Run `npx tsc --noEmit`
-   - Record: All type errors with file paths and line numbers
-   - Example: src/components/Button.tsx:12:5 - Type 'string' not assignable to 'number'
+4. **Parse and Compile Results**
+   - Process results from each agent:
+     - Linting: Extract file paths, line numbers, error messages
+     - Formatting: Extract files needing formatting
+     - Type Check: Extract type errors with locations
+     - Tests: Extract passed/failed counts, test names, execution time
+     - Build: Extract build status, errors, bundle size, build time
+     - Security: Extract vulnerabilities by severity, affected packages
+   - Example: Parse "src/utils.ts:42:10 - 'foo' is assigned but never used" → {file: "src/utils.ts", line: 42, col: 10, error: "unused variable"}
 
-5. **Run Tests**
-   - IF: "test" script exists → Run `npm test` or `npm run test`
-   - Record: passed count, failed count, failed test names, error messages, execution time
-   - IMPORTANT: Continue to next phases even if tests fail
-   - Example: 45 passed, 2 failed - "should handle edge case" failed with [error]
-
-6. **Run Build**
-   - IF: "build" script exists → Run `npm run build`
-   - Record: build success/failure, errors, bundle size (if shown), build time
-   - Optional: Clean up build artifacts after checking
-   - Example: Build failed - Cannot find module 'missing-import'
-
-7. **Security Audit**
-   - IF: ENABLE_SECURITY_CHECK is true → Run `npm audit --production`
-   - Record: vulnerabilities by severity (critical/high/moderate/low), affected packages, recommended fixes
-   - NOTE: Only report, do NOT run `npm audit fix`
-   - Example: 2 critical, 5 high, 10 moderate vulnerabilities found
-
-8. **Generate Report**
-   - Compile all results into formatted report
+5. **Generate Report**
+   - Compile all parsed results into formatted report
    - Format: Phase sections (Static Analysis, Testing, Build, Security), overall status (PASS/FAIL/WARNINGS)
    - Include: Specific file:line locations, error messages, actionable fix commands
+   - Show execution time comparison if parallel execution was used
    - Example report:
      ```
      QUALITY GATE REPORT
      Project: my-app | TypeScript
+     Execution: Parallel (6 agents, 15.2s)
 
      STATIC ANALYSIS
        Linting: ✗ FAIL (5 issues)
+         • src/utils.ts:42 - Unused variable 'foo'
+         • src/App.tsx:45 - Missing dependency in useEffect
        Formatting: ✓ PASS
        Type Check: ✗ FAIL (3 errors)
+         • src/types.ts:12 - Type 'string' not assignable to 'number'
 
      TESTING
-       Tests: ✓ PASS (45 passed)
+       Tests: ✓ PASS (45 passed, 0 failed)
        Coverage: 78%
 
      BUILD: ✓ PASS
+       Bundle size: 245 KB
+       Build time: 3.2s
+
      SECURITY: ⚠ WARNINGS (2 critical vulns)
+       • lodash@4.17.20 - Prototype Pollution
 
      OVERALL: ✗ FAILED
 
-     ISSUES:
-     • src/utils.ts:42 - Unused variable
-     • src/types.ts:12 - Type mismatch
-
      RECOMMENDATIONS:
-     • Run `npm run lint:fix`
-     • Fix type errors in src/types.ts
-     • Run `npm audit fix`
+     • Run `npm run lint:fix` to auto-fix linting issues
+     • Fix type errors in src/types.ts:12
+     • Run `npm audit fix` to update vulnerable packages
+
+     Performance: 75% faster than sequential execution (15s vs 60s)
      ```
 
 ## Failure Criteria
