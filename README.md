@@ -56,14 +56,14 @@ Track your progress through Claude Code mastery:
 - [x] Study [Skill Patterns](docs/examples/skill-patterns.md)
 - [x] Build a multi-variant skill (cookbook pattern)
 - [x] Create a tool-enhanced skill
-- [ ] Implement background agent orchestration
+- [x] Implement background agent orchestration
 - [ ] Set up context handoff pattern
 
 ### Phase 5: Mastery 🏆
 
-- [ ] Read [Configuration Guide](docs/concepts/configuration.md)
-- [ ] Set up global CLAUDE.md with your preferences
-- [ ] Create a complete project template
+- [x] Read [Configuration Guide](docs/concepts/configuration.md)
+- [x] Set up global CLAUDE.md with your preferences
+- [x] Create a complete project template
 - [ ] Build an integrated workflow (skill + tool + hook)
 - [ ] Contribute patterns back to community
 

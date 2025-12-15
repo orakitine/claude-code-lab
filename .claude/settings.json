@@ -1,4 +1,5 @@
 {
+  "dangerouslySkipPermissions": ["Read", "Grep", "Glob", "Bash", "Write"],
   "hooks": {
     "Notification": [
       {
