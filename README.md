@@ -64,7 +64,7 @@ Track your progress through Claude Code mastery:
 - [x] Read [Configuration Guide](docs/concepts/configuration.md)
 - [x] Set up global CLAUDE.md with your preferences
 - [x] Create a complete project template
-- [ ] Build an integrated workflow (skill + tool + hook)
+- [x] Build an integrated workflow (skill + tool + hook)
 - [ ] Contribute patterns back to community
 
 ## Quick Start

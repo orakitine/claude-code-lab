@@ -38,13 +38,14 @@ describe('App', () => {
     await user.click(screen.getByRole('button', { name: /add/i }));
 
     // Toggle it
-    const checkbox = screen.getByRole('checkbox', {
+    const toggleButton = screen.getByRole('button', {
       name: /toggle test todo/i,
     });
-    await user.click(checkbox);
+    await user.click(toggleButton);
 
-    expect(checkbox).toBeChecked();
     expect(screen.getByText('1 of 1 completed')).toBeInTheDocument();
+    const todoText = screen.getByText('Test todo');
+    expect(todoText.className).toContain('line-through');
   });
 
   it('deletes a todo', async () => {

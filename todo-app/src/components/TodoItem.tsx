@@ -1,3 +1,4 @@
+import { Check, X } from 'lucide-react';
 import type { Todo } from '../types';
 
 interface TodoItemProps {
@@ -9,42 +10,38 @@ interface TodoItemProps {
 export function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
   return (
     <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        padding: '0.5rem',
-        borderBottom: '1px solid #ddd',
-      }}
+      className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 dark:border-gray-700
+                 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors group"
     >
-      <input
-        type="checkbox"
-        checked={todo.completed}
-        onChange={() => onToggle(todo.id)}
-        style={{ marginRight: '0.5rem' }}
+      <button
+        onClick={() => onToggle(todo.id)}
+        className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center
+                   transition-all ${
+                     todo.completed
+                       ? 'bg-primary border-primary'
+                       : 'border-gray-300 dark:border-gray-600 hover:border-primary'
+                   }`}
         aria-label={`Toggle ${todo.text}`}
-      />
+      >
+        {todo.completed && <Check size={14} className="text-white" />}
+      </button>
       <span
-        style={{
-          flex: 1,
-          textDecoration: todo.completed ? 'line-through' : 'none',
-          color: todo.completed ? '#999' : '#333',
-        }}
+        className={`flex-1 transition-all ${
+          todo.completed
+            ? 'line-through text-gray-400 dark:text-gray-500'
+            : 'text-gray-900 dark:text-gray-100'
+        }`}
       >
         {todo.text}
       </span>
       <button
         onClick={() => onDelete(todo.id)}
-        style={{
-          padding: '0.25rem 0.5rem',
-          backgroundColor: '#ff4444',
-          color: 'white',
-          border: 'none',
-          borderRadius: '4px',
-          cursor: 'pointer',
-        }}
+        className="flex-shrink-0 p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20
+                   rounded-lg transition-colors opacity-0 group-hover:opacity-100
+                   focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-red-500"
         aria-label={`Delete ${todo.text}`}
       >
-        Delete
+        <X size={18} />
       </button>
     </div>
   );

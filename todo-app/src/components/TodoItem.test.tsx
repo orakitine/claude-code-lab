@@ -32,8 +32,8 @@ describe('TodoItem', () => {
       <TodoItem todo={mockTodo} onToggle={onToggle} onDelete={onDelete} />
     );
 
-    const checkbox = screen.getByRole('checkbox');
-    await user.click(checkbox);
+    const toggleButton = screen.getByRole('button', { name: /toggle test todo/i });
+    await user.click(toggleButton);
 
     expect(onToggle).toHaveBeenCalledWith('1');
   });
@@ -63,6 +63,6 @@ describe('TodoItem', () => {
     );
 
     const text = screen.getByText('Test todo');
-    expect(text).toHaveStyle({ textDecoration: 'line-through' });
+    expect(text.className).toContain('line-through');
   });
 });

@@ -15,6 +15,8 @@ allowed-tools:
 
 Manage complete task lifecycle from initial definition through implementation to review and completion. Provides state-based workflow with automated transitions, intelligent task discovery, quality gates, and framework-aware implementation patterns.
 
+**Tip**: For smoother workflow without permission prompts, consider adding `["Read", "Write", "Edit", "Glob", "Bash", "TodoWrite"]` to `dangerouslySkipPermissions` in your project's `.claude/settings.json`.
+
 ## Variables
 
 TASK_ID_PREFIX: TASK              # Project prefix for task IDs (TASK, BROOKLY, JIRA, etc.)
@@ -69,9 +71,9 @@ COMMIT_STYLE: conventional        # Commit message convention (conventional, ang
    - Based on workflow phase and detected framework
    - Define workflow: cookbook/define.md (framework-agnostic)
    - Refine workflow: cookbook/refine.md (framework-agnostic)
-   - Implement workflow: IF nextjs → cookbook/implement-nextjs.md, ELSE → cookbook/implement.md
-   - Review workflow: IF nextjs → cookbook/review-nextjs.md, ELSE → cookbook/review.md
-   - Example: Phase=implement + Framework=nextjs → cookbook/implement-nextjs.md
+   - Implement workflow: cookbook/implement/{framework}.md (e.g., generic.md, nextjs.md)
+   - Review workflow: cookbook/review/{framework}.md (e.g., generic.md, nextjs.md)
+   - Example: Phase=implement + Framework=nextjs → cookbook/implement/nextjs.md
 
 5. **Execute Workflow**
 
@@ -109,36 +111,22 @@ COMMIT_STYLE: conventional        # Commit message convention (conventional, ang
   - "clarify requirements for TASK-006"
   - "interview me about the authentication task"
 
-### Implement Task Workflow (Generic)
+### Implement Task Workflow
 
-- IF: User wants to implement task AND (framework is generic OR unsupported)
-- THEN: Read and execute: `.claude/skills/task-workflow/cookbook/implement.md`
+- IF: User wants to implement task
+- THEN: Detect framework, Read and execute: `.claude/skills/task-workflow/cookbook/implement/{framework}.md`
+- Framework detection: generic (default), nextjs, django, react, python
 - EXAMPLES:
-  - "implement task 006"
-  - "build TASK-006"
-  - "code the authentication feature"
+  - "implement task 006" → cookbook/implement/generic.md (default)
+  - "implement task 006" (in Next.js project) → cookbook/implement/nextjs.md
+  - "build TASK-006" → framework-aware routing
 
-### Implement Task Workflow (Next.js)
+### Review Task Workflow
 
-- IF: User wants to implement task AND framework is nextjs
-- THEN: Read and execute: `.claude/skills/task-workflow/cookbook/implement-nextjs.md`
+- IF: User wants to review task
+- THEN: Detect framework, Read and execute: `.claude/skills/task-workflow/cookbook/review/{framework}.md`
+- Framework detection: generic (default), nextjs, django, react, python
 - EXAMPLES:
-  - "implement task 006" (in Next.js project)
-  - "build TASK-006" (in Next.js project)
-
-### Review Task Workflow (Generic)
-
-- IF: User wants to review task AND (framework is generic OR unsupported)
-- THEN: Read and execute: `.claude/skills/task-workflow/cookbook/review.md`
-- EXAMPLES:
-  - "review task 006"
-  - "check TASK-006"
-  - "validate the authentication implementation"
-
-### Review Task Workflow (Next.js)
-
-- IF: User wants to review task AND framework is nextjs
-- THEN: Read and execute: `.claude/skills/task-workflow/cookbook/review-nextjs.md`
-- EXAMPLES:
-  - "review task 006" (in Next.js project)
-  - "check TASK-006" (in Next.js project)
+  - "review task 006" → cookbook/review/generic.md (default)
+  - "review task 006" (in Next.js project) → cookbook/review/nextjs.md
+  - "validate TASK-006" → framework-aware routing

@@ -10,14 +10,14 @@ interface TodoListProps {
 export function TodoList({ todos, onToggle, onDelete }: TodoListProps) {
   if (todos.length === 0) {
     return (
-      <div style={{ textAlign: 'center', padding: '2rem', color: '#999' }}>
+      <div className="text-center py-12 text-gray-400 dark:text-gray-500">
         No todos yet. Add one above!
       </div>
     );
   }
 
   return (
-    <div style={{ border: '1px solid #ddd', borderRadius: '4px' }}>
+    <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
       {todos.map(todo => (
         <TodoItem
           key={todo.id}

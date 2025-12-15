@@ -113,12 +113,17 @@ ANOTHER_VAR: value                            # Options: value1, value2, value3
 4. Workflow
 5. Cookbook (if multiple scenarios exist)
 
+**Optional Sections** (if non-duplicative):
+- **Setup/Tips**: After Purpose, before Variables - for configuration guidance, prerequisites, or setup instructions that don't belong in Workflow
+- **Prerequisites**: Before Variables - for required dependencies or environment setup
+
 **Forbidden Sections**:
-- ❌ Quick Reference
-- ❌ Examples (separate from Workflow)
-- ❌ Notes
+- ❌ Quick Reference (duplicates Workflow)
+- ❌ Examples (separate from Workflow - use inline)
+- ❌ Notes (use inline comments on Variables)
 - ❌ Instructions (merge into Workflow)
-- ❌ Success Criteria
+- ❌ Success Criteria (implied by Workflow completion)
+- ❌ Decorative emojis (functional icons acceptable in limited cases)
 
 ### Required Cookbook File Structure
 
@@ -318,8 +323,12 @@ MODE_VAR: display                             # Options: display, save, export
 - Notes sections (use inline comments on Variables)
 - Instructions sections (merge into Workflow)
 - Success Criteria (implied by Workflow completion)
-- Emojis (unless specifically requested)
+- Decorative emojis (unless specifically requested)
 - Verbose explanations (be concise)
+
+**✅ Can include** (if providing unique value):
+- Setup/Tips section (after Purpose, non-duplicative configuration guidance)
+- Prerequisites section (before Variables, dependency requirements)
 
 ### Inline Example Standards
 
@@ -570,6 +579,8 @@ allowed-tools:
 
 Run comprehensive Quality Gate checks to verify code quality before committing. Non-destructive analysis only - reports issues without auto-fixing. Includes linting, formatting, type safety, tests, build verification, and security checks.
 
+**Tip**: For parallel execution, add `ENABLE_PARALLEL_EXECUTION: true` to your project's Variables.
+
 ## Variables
 
 ENABLE_JAVASCRIPT: true           # Enable JavaScript/TypeScript quality checks
@@ -624,6 +635,7 @@ ENABLE_SECURITY_CHECK: true       # Enable security vulnerability scanning
 **Why this is good**:
 - ✅ Explicit frontmatter (trigger, allowed-tools)
 - ✅ Clear Purpose paragraph
+- ✅ Optional Tip section (non-duplicative setup guidance)
 - ✅ Variables with inline comments
 - ✅ Workflow with inline examples in every step
 - ✅ IF/THEN conditionals clear
