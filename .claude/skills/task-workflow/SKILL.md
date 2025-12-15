@@ -1,7 +1,7 @@
 ---
 name: Task Workflow Manager
 description: Complete task lifecycle management system with state-based workflow. Define, refine, implement, and review tasks with automated quality gates and intelligent discovery.
-trigger: both
+trigger: manual
 allowed-tools:
   - Read
   - Write
