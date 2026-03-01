@@ -82,26 +82,14 @@ A **subagent** wraps a skill into an autonomous unit that can be spawned multipl
 2. Read your lab's docs: `../../docs/concepts/background-agents.md`
 3. Notice: simple agent (thin wrapper) vs specialized agent (QA with screenshots)
 
-### Exercise 2.1: Analyze Agent Patterns
-Answer in `module-2-notes.md`:
-1. What's the difference between the simple `playwright-bowser-agent` and the specialized `bowser-qa-agent`?
-2. How does the QA agent structure its output (pass/fail, screenshots)?
-3. What is the "agent frontmatter" pattern (model, skills activation)?
-4. How do agents enable parallelism that a single skill can't?
+### Exercise 2.1: Analyze Agent Patterns (DONE — see modules/module-2-subagents.md)
+Covers: simple vs specialized agents, frontmatter pattern, session isolation for parallelism.
 
-### Exercise 2.2: Build a Simple Browser Agent
-Create `../../.claude/agents/playwright-browser-agent.md`:
-- Thin wrapper that activates the playwright-browser skill
-- Takes a prompt, executes browser work, returns results
-- Keep it simple — this is the "general purpose" agent
+### Exercise 2.2: Build a Simple Browser Agent (DONE)
+Created `../../.claude/agents/playwright-browser-agent.md` — thin 2-line wrapper activating playwright-browser skill.
 
-### Exercise 2.3: Build a QA Agent
-Create `../../.claude/agents/browser-qa-agent.md`:
-- Specialized agent that accepts user stories
-- Parses stories into discrete steps
-- Creates screenshot directory per story
-- Executes steps with screenshots at each stage
-- Returns structured pass/fail report
+### Exercise 2.3: Build a QA Agent (DONE)
+Created `../../.claude/agents/browser-qa-agent.md` — structured pass/fail reporting with screenshots at every step.
 
 ### Exercise 2.4: Test the QA Agent
 Use the agent directly (via `@browser-qa-agent` reference) with this story:
@@ -116,11 +104,11 @@ Steps:
 ```
 
 ### Checkpoint
-- [ ] Can explain why agents exist as a separate layer from skills
+- [x] Can explain why agents exist as a separate layer from skills
 - [ ] Simple agent works for ad-hoc browser tasks
 - [ ] QA agent produces screenshots and a pass/fail report
-- [ ] Understand the frontmatter pattern for agent configuration
-- [ ] Notes written in `module-2-notes.md`
+- [x] Understand the frontmatter pattern for agent configuration
+- [x] Learning doc written in `modules/module-2-subagents.md`
 
 ### Reflection Questions
 - When would you use the simple agent vs the QA agent?
@@ -141,28 +129,17 @@ A **command** (slash command) orchestrates multiple agents into coordinated work
 2. Read: `./reference/commands/hop-automate-summary.md`
 3. Read your lab's docs: `../../docs/concepts/commands.md`
 
-### Exercise 3.1: Understand Orchestration Patterns
-Answer in `module-3-notes.md`:
-1. What are the 4 phases of `/ui-review`? (Discover, Spawn, Collect, Report)
-2. How does the command teach the orchestrator agent to prompt sub-agents? (Meta-prompting)
-3. What is a "higher-order prompt" (hop)? How is it like a function that takes a function?
-4. How do user stories get discovered and distributed?
+### Exercise 3.1: Understand Orchestration Patterns (DONE — see modules/module-3-commands.md)
+Covers: meta-prompting, higher-order prompts, 4-phase orchestration, keyword detection pattern.
 
-### Exercise 3.2: Create User Story Files
-Create `../../ai_review/user_stories/hackernews.yaml` (see `./reference/user-stories/hackernews.yaml` for format)
+### Exercise 3.2: Create User Story Files (DONE)
+Created `../../ai_review/user_stories/hackernews.yaml` — 3 stories (front page, pagination, comments).
 
-### Exercise 3.3: Build the UI Review Command
-Create `../../.claude/commands/ui-review.md`:
-- Phase 1: Discover — glob YAML files from `ai_review/user_stories/`
-- Phase 2: Spawn — fan out stories to parallel `@browser-qa-agent` instances
-- Phase 3: Collect — gather pass/fail results from all agents
-- Phase 4: Report — generate summary table
+### Exercise 3.3: Build the UI Review Command (DONE)
+Created `../../.claude/commands/ui-review.md` — 5-step workflow: Parse Args → Discover → Spawn → Collect → Report.
 
-### Exercise 3.4: Build a Higher-Order Prompt
-Create `../../.claude/commands/bowser/hop-automate.md`:
-- Accepts $ARGUMENTS as a workflow file path
-- Loads the workflow, wraps it in consistent setup/teardown
-- Executes via the playwright skill
+### Exercise 3.4: Build a Higher-Order Prompt (DONE)
+Created `../../.claude/commands/bowser/hop-automate.md` — workflow runner with keyword detection for mode/vision.
 
 ### Exercise 3.5: Test Orchestration
 Run `/ui-review` and verify:
@@ -171,11 +148,11 @@ Run `/ui-review` and verify:
 - Summary report shows pass/fail for all stories
 
 ### Checkpoint
-- [ ] Can explain the orchestration pattern (discover -> spawn -> collect -> report)
-- [ ] User stories in YAML format drive the test suite
+- [x] Can explain the orchestration pattern (discover -> spawn -> collect -> report)
+- [x] User stories in YAML format drive the test suite
 - [ ] `/ui-review` successfully coordinates parallel agents
-- [ ] Understand the higher-order prompt pattern
-- [ ] Notes written in `module-3-notes.md`
+- [x] Understand the higher-order prompt pattern
+- [x] Learning doc written in `modules/module-3-commands.md`
 
 ### Reflection Questions
 - Why is meta-prompting (teaching the orchestrator how to prompt sub-agents) important?
@@ -195,21 +172,11 @@ A **justfile** is the top-level entry point — terminal-accessible recipes that
 1. Read Bowser's justfile: `./reference/justfile`
 2. Read about `just`: https://just.systems/
 
-### Exercise 4.1: Design Your Justfile
-Plan recipes in `module-4-notes.md`:
-- What recipes do you need for each layer?
-- What default parameters make sense?
-- How should variables be overridable?
+### Exercise 4.1: Design Your Justfile (DONE — see modules/module-4-justfile.md)
+Covers: layer-by-layer organization, default variables, model override, --dangerously-skip-permissions.
 
-### Exercise 4.2: Build the Justfile
-Create `../../justfile` (project root) with recipes for each layer:
-```
-default              — list all commands
-test-skill prompt    — test the raw playwright skill
-test-qa story        — test a single QA agent run
-ui-review            — run full parallel UI review
-automate workflow    — run a browser automation workflow
-```
+### Exercise 4.2: Build the Justfile (DONE)
+Created `../../justfile` — 9 recipes across all 4 layers, verified with `just --list`.
 
 ### Exercise 4.3: Test End-to-End
 Run `just ui-review` from terminal and verify the entire 4-layer stack fires:
@@ -218,11 +185,11 @@ justfile → command → agents → skill → Playwright CLI → browser
 ```
 
 ### Checkpoint
-- [ ] Justfile has recipes for every layer
-- [ ] `just` (no args) lists all available commands
+- [x] Justfile has recipes for every layer
+- [x] `just` (no args) lists all available commands
 - [ ] `just ui-review` triggers the full stack
-- [ ] Can explain why a justfile is valuable as the reusability layer
-- [ ] Notes written in `module-4-notes.md`
+- [x] Can explain why a justfile is valuable as the reusability layer
+- [x] Learning doc written in `modules/module-4-justfile.md`
 
 ---
 
@@ -265,23 +232,32 @@ Create `LEARNINGS.md` right here in this directory:
 
 ## File Summary
 
-**What you'll build:**
+**Built (all 4 layers):**
 
-| Layer | File | Purpose |
-|-------|------|---------|
-| 1 | `.claude/skills/playwright-browser/SKILL.md` | Playwright CLI capability |
-| 2 | `.claude/agents/playwright-browser-agent.md` | Simple browser agent |
-| 2 | `.claude/agents/browser-qa-agent.md` | Specialized QA agent |
-| 3 | `.claude/commands/ui-review.md` | Parallel story orchestrator |
-| 3 | `.claude/commands/bowser/hop-automate.md` | Higher-order prompt runner |
-| 3 | `ai_review/user_stories/hackernews.yaml` | Test story definitions |
-| 4 | `justfile` | Terminal entry points |
+| Layer | File | Status |
+|-------|------|--------|
+| 1 | `.claude/skills/playwright-browser/SKILL.md` | DONE |
+| 1 | `.claude/skills/playwright-browser/docs/playwright-cli-reference.md` | DONE |
+| 2 | `.claude/agents/playwright-browser-agent.md` | DONE |
+| 2 | `.claude/agents/browser-qa-agent.md` | DONE |
+| 3 | `.claude/commands/ui-review.md` | DONE |
+| 3 | `.claude/commands/bowser/hop-automate.md` | DONE |
+| 3 | `ai_review/user_stories/hackernews.yaml` | DONE |
+| 4 | `justfile` | DONE |
 
-**Notes you'll write:**
-- `module-1-notes.md` through `module-4-notes.md`
-- `LEARNINGS.md`
+**Learning docs (tiny lectures + adaptation walkthroughs):**
 
-**Reference material** (already saved):
+| Module | File | Status |
+|--------|------|--------|
+| 1 | `modules/module-1-skills.md` | DONE |
+| 2 | `modules/module-2-subagents.md` | DONE |
+| 3 | `modules/module-3-commands.md` | DONE |
+| 4 | `modules/module-4-justfile.md` | DONE |
+| 5 | `LEARNINGS.md` | TODO (after testing) |
+
+**Still to do:** Test each layer (Exercises 1.3, 2.4, 3.5, 4.3) + Module 5 synthesis.
+
+**Reference material** (from Bowser repo):
 - `./reference/skills/` — Bowser's Playwright skill
 - `./reference/agents/` — Bowser's agent definitions
 - `./reference/commands/` — Bowser's command summaries
