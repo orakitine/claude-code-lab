@@ -1,0 +1,24 @@
+stories:
+  - name: "Character pill filters"
+    url: "https://luna.rakitine.com/"
+    workflow: |
+      Navigate to https://luna.rakitine.com/
+      Verify character filter pills are visible (All stories, Luna, Ember, Patches, Silas, Finn, and a "More" button)
+      Click the "More ▾" pill to expand hidden character filters
+      Verify additional character pills appear
+      Click the "Luna" filter pill
+      Verify displayed stories are filtered to only show stories featuring Luna
+      Click "All stories" pill to reset the filter
+      Verify all stories are shown again
+
+  - name: "Story page font sizing"
+    url: "https://luna.rakitine.com/"
+    workflow: |
+      Navigate to https://luna.rakitine.com/
+      Click the first story to open it
+      Verify the story page loads with a title and story text
+      Locate the 4 font size preset buttons (smallest to largest)
+      Click the largest font size button
+      Verify the story text font size increased
+      Click the smallest font size button
+      Verify the story text font size decreased

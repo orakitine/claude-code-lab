@@ -50,17 +50,13 @@ Created `../../.claude/skills/playwright-browser/SKILL.md` — adapted from Bows
 - Removed forbidden sections (Quick Reference, Key Details, Sessions, Configuration)
 - Added CLI reference doc at `docs/playwright-cli-reference.md`
 
-### Exercise 1.3: Test the Skill
-Activate the skill manually and ask Claude to:
-1. Open a headless browser session named "test-hn"
-2. Navigate to https://news.ycombinator.com
-3. Take a screenshot
-4. Close the session
+### Exercise 1.3: Test the Skill (DONE)
+Tested against luna.rakitine.com — opened session, navigated to homepage, clicked into first story, screenshotted, closed.
 
 ### Checkpoint
 - [x] Skill file follows SKILL_CREATION_PRINCIPLES.md format
-- [ ] Can explain the difference between a skill and just prompting Claude directly
-- [ ] Successfully used the skill to screenshot Hacker News
+- [x] Can explain the difference between a skill and just prompting Claude directly
+- [x] Successfully used the skill to screenshot luna.rakitine.com
 - [x] Learning doc written in `modules/module-1-skills.md`
 
 ### Reflection Questions
@@ -91,22 +87,13 @@ Created `../../.claude/agents/playwright-browser-agent.md` — thin 2-line wrapp
 ### Exercise 2.3: Build a QA Agent (DONE)
 Created `../../.claude/agents/browser-qa-agent.md` — structured pass/fail reporting with screenshots at every step.
 
-### Exercise 2.4: Test the QA Agent
-Use the agent directly (via `@browser-qa-agent` reference) with this story:
-```
-Name: Hacker News Front Page
-URL: https://news.ycombinator.com
-Steps:
-1. Navigate to the URL
-2. Verify the page title contains "Hacker News"
-3. Confirm at least 10 story links are visible
-4. Take a screenshot of the front page
-```
+### Exercise 2.4: Test the QA Agent (DONE)
+Tested against luna.rakitine.com with 2 stories in parallel: character pill filters (8/8 PASS) and story page font sizing (8/8 PASS). Screenshots saved to `screenshots/browser-qa/`.
 
 ### Checkpoint
 - [x] Can explain why agents exist as a separate layer from skills
-- [ ] Simple agent works for ad-hoc browser tasks
-- [ ] QA agent produces screenshots and a pass/fail report
+- [x] Simple agent works for ad-hoc browser tasks
+- [x] QA agent produces screenshots and a pass/fail report
 - [x] Understand the frontmatter pattern for agent configuration
 - [x] Learning doc written in `modules/module-2-subagents.md`
 
@@ -141,16 +128,13 @@ Created `../../.claude/commands/ui-review.md` — 5-step workflow: Parse Args �
 ### Exercise 3.4: Build a Higher-Order Prompt (DONE)
 Created `../../.claude/commands/bowser/hop-automate.md` — workflow runner with keyword detection for mode/vision.
 
-### Exercise 3.5: Test Orchestration
-Run `/ui-review` and verify:
-- Multiple agents spawn in parallel
-- Each produces screenshots in its own directory
-- Summary report shows pass/fail for all stories
+### Exercise 3.5: Test Orchestration (DONE)
+Ran `/ui-review` — discovered 2 YAML files (5 stories), spawned 5 parallel QA agents, all PASS. Screenshots in `screenshots/browser-qa/2026-03-01_22-56-58_c18c5b90/`.
 
 ### Checkpoint
 - [x] Can explain the orchestration pattern (discover -> spawn -> collect -> report)
 - [x] User stories in YAML format drive the test suite
-- [ ] `/ui-review` successfully coordinates parallel agents
+- [x] `/ui-review` successfully coordinates parallel agents
 - [x] Understand the higher-order prompt pattern
 - [x] Learning doc written in `modules/module-3-commands.md`
 
@@ -178,16 +162,13 @@ Covers: layer-by-layer organization, default variables, model override, --danger
 ### Exercise 4.2: Build the Justfile (DONE)
 Created `../../justfile` — 9 recipes across all 4 layers, verified with `just --list`.
 
-### Exercise 4.3: Test End-to-End
-Run `just ui-review` from terminal and verify the entire 4-layer stack fires:
-```
-justfile → command → agents → skill → Playwright CLI → browser
-```
+### Exercise 4.3: Test End-to-End (DONE)
+Ran `just ui-review` from separate terminal — full 4-layer stack fired successfully. Noted: uses `claude` (interactive) not `--print`; for CI/hooks would need `--print`.
 
 ### Checkpoint
 - [x] Justfile has recipes for every layer
 - [x] `just` (no args) lists all available commands
-- [ ] `just ui-review` triggers the full stack
+- [x] `just ui-review` triggers the full stack
 - [x] Can explain why a justfile is valuable as the reusability layer
 - [x] Learning doc written in `modules/module-4-justfile.md`
 
@@ -255,7 +236,9 @@ Create `LEARNINGS.md` right here in this directory:
 | 4 | `modules/module-4-justfile.md` | DONE |
 | 5 | `LEARNINGS.md` | TODO (after testing) |
 
-**Still to do:** Test each layer (Exercises 1.3, 2.4, 3.5, 4.3) + Module 5 synthesis.
+**Still to do:** Exercise 4.3 (justfile end-to-end) + Module 5 synthesis.
+
+**Note:** In Module 5, build a `hop-automate` workflow file to exercise the higher-order prompt runner hands-on.
 
 **Reference material** (from Bowser repo):
 - `./reference/skills/` — Bowser's Playwright skill

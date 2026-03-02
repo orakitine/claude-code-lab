@@ -31,17 +31,17 @@ test-qa headed="false" prompt=default_qa_prompt:
 
 # Run parallel UI review across all YAML user stories
 ui-review *flags="":
-    claude --dangerously-skip-permissions --model {{model}} "/ui-review {{flags}}"
+    claude --dangerously-skip-permissions --model {{model}} "/browser:ui-review {{flags}}"
 
 # Run a saved browser automation workflow
-hop workflow="blog-summarizer" *args="":
-    claude --dangerously-skip-permissions --model {{model}} "/bowser:hop-automate {{workflow}} {{args}}"
+run-workflow workflow="blog-summarizer" *args="":
+    claude --dangerously-skip-permissions --model {{model}} "/browser:run-workflow {{workflow}} {{args}}"
 
 # ─── Layer 4: Just (Reusability) ─────────────────────────────
 
 # Summarize a blog (headless, no auth needed)
 summarize-blog url="https://simonwillison.net/":
-    just hop blog-summarizer "{{url}} headless"
+    just run-workflow blog-summarizer "{{url}} headless"
 
 # Run UI review in headed mode (watch the browsers)
 ui-review-headed:

@@ -1,7 +1,7 @@
 ---
 name: Playwright Browser
 description: Headless browser automation using Playwright CLI. Use for browser testing, screenshots, scraping, and parallel browser sessions. Token-efficient CLI — no MCP overhead.
-trigger: manual
+trigger: auto
 allowed-tools:
   - Bash
   - Read
@@ -14,10 +14,10 @@ Automate browsers using `playwright-cli`, a token-efficient CLI for Playwright. 
 
 ## Variables
 
-HEADED: false                              # Show browser window. Options: true, false
-VISION: false                              # Return screenshots as images in context (higher token cost)
-VIEWPORT_SIZE: 1440x900                    # Browser viewport dimensions (WxH)
-SCREENSHOTS_DIR: ./screenshots             # Where screenshots are saved
+HEADED: false # Show browser window. Options: true, false
+VISION: false # Return screenshots as images in context (higher token cost)
+VIEWPORT_SIZE: 1440x900 # Browser viewport dimensions (WxH)
+SCREENSHOTS_DIR: ./screenshots # Where screenshots are saved
 
 ## Workflow
 
@@ -68,13 +68,26 @@ SCREENSHOTS_DIR: ./screenshots             # Where screenshots are saved
 
 ## Additional Commands Reference
 
-Available commands (use `playwright-cli --help <command>` for details):
+| Command | Description | Example |
+|---------|-------------|---------|
+| `open [url]` | Launch browser | `-s=test open https://example.com --persistent` |
+| `close` | Close session | `-s=test close` |
+| `goto <url>` | Navigate to URL | `-s=test goto https://example.com/page2` |
+| `snapshot` | Get element refs | `-s=test snapshot` |
+| `screenshot` | Capture page image | `-s=test screenshot --filename=out.png` |
+| `click <ref>` | Click element | `-s=test click e12` |
+| `fill <ref> <text>` | Fill input field | `-s=test fill e15 "hello"` |
+| `type <text>` | Type into focused | `-s=test type "search"` |
+| `press <key>` | Press keyboard key | `-s=test press Enter` |
+| `hover <ref>` | Hover over element | `-s=test hover e20` |
+| `select <ref> <val>` | Select dropdown | `-s=test select e30 "option1"` |
+| `go-back` | Back | `-s=test go-back` |
+| `go-forward` | Forward | `-s=test go-forward` |
+| `reload` | Reload page | `-s=test reload` |
+| `tab-list` | List tabs | `-s=test tab-list` |
+| `tab-new [url]` | New tab | `-s=test tab-new https://example.com` |
+| `tab-select <i>` | Switch tab | `-s=test tab-select 1` |
+| `list` | List sessions | `list` |
+| `close-all` | Close all sessions | `close-all` |
 
-- **Navigation**: `open [url]`, `goto <url>`, `go-back`, `go-forward`, `reload`
-- **Input**: `click <ref>`, `dblclick <ref>`, `fill <ref> <text>`, `type <text>`, `press <key>`, `select <ref> <val>`, `check <ref>`, `uncheck <ref>`, `hover <ref>`
-- **Capture**: `snapshot`, `screenshot [--filename=<f>]`, `pdf`
-- **Tabs**: `tab-list`, `tab-new [url]`, `tab-close [index]`, `tab-select <index>`
-- **Storage**: `state-save`, `state-load`, `cookie-get`, `cookie-clear`
-- **DevTools**: `console`, `run-code <js>`, `network`
-- **Sessions**: `list`, `close-all`, `kill-all`
-- **Config**: `open --headed`, `open --browser=chrome`, `resize <w> <h>`
+**Common flags**: `--persistent` (cookies/state), `--headed` (visible browser), `--browser=chrome`, `--filename=<path>`

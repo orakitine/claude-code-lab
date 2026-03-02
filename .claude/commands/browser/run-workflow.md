@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Higher-order prompt that executes saved browser automation workflows from `.claude/commands/bowser/` with consistent setup, teardown, and reporting. Think of this as a function that takes a workflow as a parameter.
+Higher-order prompt that executes saved browser automation workflows from `.claude/commands/browser/workflows/` with consistent setup, teardown, and reporting. Think of this as a function that takes a workflow as a parameter.
 
 ## Variables
 
@@ -20,14 +20,14 @@ PROMPT: ""                                 # Additional text to inject into the 
    - IF: "headless" found → set MODE=headless
    - IF: "vision" found → set VISION=true
    - Remaining text → set PROMPT
-   - Example: `/bowser:hop-automate blog-summarizer https://example.com headed` → WORKFLOW=blog-summarizer, MODE=headed, PROMPT="https://example.com"
+   - Example: `/browser:run-workflow blog-summarizer https://example.com headed` → WORKFLOW=blog-summarizer, MODE=headed, PROMPT="https://example.com"
 
 2. **Validate Workflow**
-   - IF: no WORKFLOW specified → list available workflows from `.claude/commands/bowser/` and return
-   - Check file exists: `.claude/commands/bowser/<WORKFLOW>.md`
+   - IF: no WORKFLOW specified → list available workflows from `.claude/commands/browser/workflows/` and return
+   - Check file exists: `.claude/commands/browser/workflows/<WORKFLOW>.md`
    - IF: file not found → report error with available workflow names
-   - Example: `/bowser:hop-automate` → "Available workflows: blog-summarizer, amazon-add-to-cart"
-   - Tool: Glob `.claude/commands/bowser/*.md`
+   - Example: `/browser:run-workflow` → "Available workflows: blog-summarizer, amazon-add-to-cart"
+   - Tool: Glob `.claude/commands/browser/workflows/*.md`
 
 3. **Load Workflow**
    - Read the workflow file
@@ -35,7 +35,7 @@ PROMPT: ""                                 # Additional text to inject into the 
    - Command-line arguments override frontmatter defaults
    - IF: PROMPT is set → inject it into the workflow content
    - Example: workflow file says `mode: headed` but args say "headless" → use headless
-   - Tool: Read `.claude/commands/bowser/<WORKFLOW>.md`
+   - Tool: Read `.claude/commands/browser/workflows/<WORKFLOW>.md`
 
 4. **Execute Workflow**
    - Activate the `/playwright-browser` skill
